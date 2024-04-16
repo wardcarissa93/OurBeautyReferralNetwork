@@ -1,0 +1,6 @@
+@OurBeautyReferralNetwork_HostAddress = http://localhost:5225
+
+GET {{OurBeautyReferralNetwork_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
