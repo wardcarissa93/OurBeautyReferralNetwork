@@ -1,19 +1,28 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OurBeautyReferralNetwork.Data;
-using OurBeautyReferralNetwork.Utilities;
+using OurBeautyReferralNetwork.Utilities; // Import KeyGenerator
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Generate and set the JWT key
-var jwtKey = KeyGenerator.GenerateRandomKey(256);
-builder.Configuration
+// Generate random JWT key
+var jwtKey = KeyGenerator.GenerateRandomKey(32); // Generate a 256-bit key (32 bytes)
+
+// Update program secrets with the generated JWT key
+var configuration = builder.Configuration;
+var jwtSection = configuration.GetSection("Jwt");
+jwtSection["Key"] = jwtKey;
+
+// Load JWT issuer from configuration
+var jwtIssuer = jwtSection["Issuer"];
 
 builder.Services.AddAuthentication("JwtBearer")
     .AddJwtBearer("JwtBearer", options =>
@@ -23,14 +32,15 @@ builder.Services.AddAuthentication("JwtBearer")
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(jwtKey)),
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidIssuer = jwtIssuer,
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = jwtIssuer,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
     });
 
+// Configure identity options
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -47,9 +57,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5173")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -58,6 +78,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowReactApp"); 
+
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();
