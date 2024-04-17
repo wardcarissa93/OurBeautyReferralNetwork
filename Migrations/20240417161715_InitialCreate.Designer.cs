@@ -12,7 +12,7 @@ using OurBeautyReferralNetwork.Data;
 namespace OurBeautyReferralNetwork.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240416172544_InitialCreate")]
+    [Migration("20240417161715_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
