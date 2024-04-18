@@ -7,6 +7,7 @@ namespace OurBeautyReferralNetwork.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
         { 
+
         
         }
 
