@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Utilities; // Import KeyGenerator
 using System;
 
@@ -13,7 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
 
+
 // Add services to the container.
+builder.Services.AddDbContext<obrnDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
