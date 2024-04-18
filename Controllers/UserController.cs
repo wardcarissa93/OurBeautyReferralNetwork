@@ -16,13 +16,15 @@ namespace OurBeautyReferralNetwork.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly obrnDbContext _obrnContext;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public UserController(ApplicationDbContext context,
+        public UserController(ApplicationDbContext context,obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
             _context = context;
+            _obrnContext = obrnContext;
             _userManager = userManager;
             _configuration = configuration;
         }
@@ -30,7 +32,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [HttpGet("getusers")]
         public ActionResult<IEnumerable<User>> GetUsers()
         {
-            var users = _context.Users.ToList();
+            var users = _obrnContext.Feeandcommissions.ToList();
             return Ok(users);
         }
 
