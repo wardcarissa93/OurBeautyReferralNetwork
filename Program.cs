@@ -6,9 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
-
-//using OurBeautyReferralNetwork.Models;
-using OurBeautyReferralNetwork.Utilities; // Import KeyGenerator
+using OurBeautyReferralNetwork.Repositories;
+using OurBeautyReferralNetwork.Utilities; 
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +25,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 Console.WriteLine($"Connection string: {connectionString}");
 
+builder.Services.AddScoped<CustomerRepo>();
+builder.Services.AddScoped<JWTUtilities>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block
 using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
@@ -45,7 +46,7 @@ using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
 }
 
 // Generate random JWT key
-var jwtKey = KeyGenerator.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)
+var jwtKey = JWTUtilities.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)
 
 // Update program secrets with the generated JWT key
 var configuration = builder.Configuration;
