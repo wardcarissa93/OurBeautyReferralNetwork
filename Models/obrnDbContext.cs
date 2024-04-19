@@ -58,7 +58,7 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.Appointmenttime).HasColumnName("appointmenttime");
             entity.Property(e => e.Fkcustomerid).HasColumnName("fkcustomerid");
             entity.Property(e => e.Fkserviceid).HasColumnName("fkserviceid");
-            entity.Property(e => e.Paymentstatus)
+            entity.Property(e => e.Referred)
                 .HasMaxLength(1)
                 .HasColumnName("paymentstatus");
 

@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OurBeautyReferralNetwork.Models;
 
 public partial class Review
 {
+    [Column("pkReviewId")]
     public int Pkreviewid { get; set; }
 
+    [Column("fkBusinessID")]
     public int Fkbusinessid { get; set; }
 
+    [Column("fkCustomerID")]
     public int Fkcustomerid { get; set; }
 
     public string Description { get; set; } = null!;

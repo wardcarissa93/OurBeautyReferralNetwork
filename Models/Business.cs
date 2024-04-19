@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OurBeautyReferralNetwork.Models;
 
 public partial class Business
 {
+
+    [Column("pkBusinessID")]
     public int Pkbusinessid { get; set; }
 
     public string Name { get; set; } = null!;
 
     public string Logo { get; set; } = null!;
 
+    [Column("ContactName")]
     public string Contactname { get; set; } = null!;
 
     public string Address { get; set; } = null!;
@@ -19,23 +23,33 @@ public partial class Business
 
     public string Province { get; set; } = null!;
 
+    [Column("PostalCode")]
     public string Postalcode { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
     public string Phone { get; set; } = null!;
 
+    [Column("InsuranceCompany")]
     public string Insurancecompany { get; set; } = null!;
 
+    [Column("InsuranceExpiryDate")]
     public DateOnly Insuranceexpirydate { get; set; }
 
+    [Column("RegistrationDate")]
+
     public DateOnly Registrationdate { get; set; }
+
+    [Column("CommissionPaid")]
 
     public char Commissionpaid { get; set; }
 
     public string? Description { get; set; }
 
+    [Column("VerificationDocument")]
     public string Verificationdocument { get; set; } = null!;
+
+    [Column("IsVerified")]
 
     public char Isverified { get; set; }
 
