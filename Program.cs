@@ -6,8 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
-
-//using OurBeautyReferralNetwork.Models;
+using OurBeautyReferralNetwork.Repositories;
 using OurBeautyReferralNetwork.Utilities; 
 using System;
 
@@ -26,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 Console.WriteLine($"Connection string: {connectionString}");
 
+builder.Services.AddScoped<CustomerRepo>();
 builder.Services.AddScoped<JWTUtilities>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block

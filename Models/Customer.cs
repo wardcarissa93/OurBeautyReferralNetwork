@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OurBeautyReferralNetwork.Models;
 
@@ -21,7 +22,8 @@ public partial class Customer
 
     public string Phone { get; set; } = null!;
 
-    public DateOnly Birthdate { get; set; }
+    [Column(TypeName = "date")]
+    public DateTime Birthdate { get; set; }
 
     public string? Photo { get; set; }
 
