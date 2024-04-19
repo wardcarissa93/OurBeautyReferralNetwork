@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OurBeautyReferralNetwork.Data;
-using OurBeautyReferralNetwork.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,45 +15,43 @@ namespace OurBeautyReferralNetwork.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly obrnDbContext _obrnContext;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public UserController(ApplicationDbContext context,obrnDbContext obrnContext,
+        public UserController(ApplicationDbContext context,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
             _context = context;
-            _obrnContext = obrnContext;
             _userManager = userManager;
             _configuration = configuration;
         }
 
         [HttpGet("getusers")]
-        public ActionResult<IEnumerable<User>> GetUsers()
-        {
-            var users = _obrnContext.Feeandcommissions.ToList();
-            return Ok(users);
-        }
+        //public ActionResult<IEnumerable<User>> GetUsers()
+        //{
+        //    var users = _obrnContext.Feeandcommissions.ToList();
+        //    return Ok(users);
+        //}
 
-        [HttpPost("adduser")]
-        public async Task<IActionResult> AddUser(User model)
-        {
-            var user = new IdentityUser
-            {
-                UserName = model.Email,
-                Email = model.Email
-            };
+        //[HttpPost("adduser")]
+        //public async Task<IActionResult> AddUser(User model)
+        //{
+        //    var user = new IdentityUser
+        //    {
+        //        UserName = model.Email,
+        //        Email = model.Email
+        //    };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+        //    var result = await _userManager.CreateAsync(user, model.Password);
 
-            if (result.Succeeded)
-            {
-                var token = GenerateJwtToken(user);
-                return Ok(new { Message = "User added successfully" });
-            }
+        //    if (result.Succeeded)
+        //    {
+        //        var token = GenerateJwtToken(user);
+        //        return Ok(new { Message = "User added successfully" });
+        //    }
 
-            return BadRequest(result.Errors);
-        }
+        //    return BadRequest(result.Errors);
+        //}
 
         private string GenerateJwtToken(IdentityUser user)
         {
