@@ -8,7 +8,7 @@ using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 
 //using OurBeautyReferralNetwork.Models;
-using OurBeautyReferralNetwork.Utilities; // Import KeyGenerator
+using OurBeautyReferralNetwork.Utilities; 
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 Console.WriteLine($"Connection string: {connectionString}");
 
+builder.Services.AddScoped<JWTUtilities>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block
 using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
