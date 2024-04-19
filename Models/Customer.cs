@@ -7,7 +7,7 @@ namespace OurBeautyReferralNetwork.Models;
 public partial class Customer
 {
     [Column("pkCustomerID")]
-    public int Pkcustomerid { get; set; }
+    public required string Pkcustomerid { get; set; }
 
     [Column("FirstName")]
     public string Firstname { get; set; } = null!;

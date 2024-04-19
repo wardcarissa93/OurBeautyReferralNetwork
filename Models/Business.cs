@@ -8,7 +8,7 @@ public partial class Business
 {
 
     [Column("pkBusinessID")]
-    public int Pkbusinessid { get; set; }
+    public required string Pkbusinessid { get; set; }
 
     public string Name { get; set; } = null!;
 
