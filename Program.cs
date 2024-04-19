@@ -45,7 +45,7 @@ using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
 }
 
 // Generate random JWT key
-var jwtKey = KeyGenerator.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)
+var jwtKey = JWTUtilities.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)
 
 // Update program secrets with the generated JWT key
 var configuration = builder.Configuration;

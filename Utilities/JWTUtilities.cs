@@ -2,7 +2,7 @@
 
 namespace OurBeautyReferralNetwork.Utilities
 {
-    public class KeyGenerator
+    public class JWTUtilities
     {
         public static string GenerateRandomKey(int keyLength)
         {
