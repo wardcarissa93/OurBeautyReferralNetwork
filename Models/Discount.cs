@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OurBeautyReferralNetwork.Models;
 
 public partial class Discount
 {
-    [Column("pkDiscountID")]
     public string Pkdiscountid { get; set; } = null!;
 
     public string Image { get; set; } = null!;
