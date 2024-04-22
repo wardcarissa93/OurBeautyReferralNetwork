@@ -5,21 +5,21 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Appointment
 {
-    public int Pkappointmentid { get; set; }
+    public int PkAppointmentId { get; set; }
 
-    public string Fkcustomerid { get; set; }
+    public string FkCustomerId { get; set; } = null!;
 
-    public DateOnly Appointmentdate { get; set; }
+    public DateOnly AppointmentDate { get; set; }
 
-    public TimeOnly Appointmenttime { get; set; }
+    public TimeOnly AppointmentTime { get; set; }
 
-    public char Paymentstatus { get; set; }
+    public bool Referred { get; set; }
 
-    public int? Fkserviceid { get; set; }
+    public int? FkServiceId { get; set; }
 
-    public virtual ICollection<Appointmentservice> Appointmentservices { get; set; } = new List<Appointmentservice>();
+    public virtual ICollection<AppointmentService> AppointmentServices { get; set; } = new List<AppointmentService>();
 
-    public virtual Customer Fkcustomer { get; set; } = null!;
+    public virtual Customer FkCustomer { get; set; } = null!;
 
-    public virtual Appointmentservice? Fkservice { get; set; }
+    public virtual AppointmentService? FkService { get; set; }
 }

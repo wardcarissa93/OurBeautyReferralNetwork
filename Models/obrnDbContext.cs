@@ -17,7 +17,7 @@ public partial class obrnDbContext : DbContext
 
     public virtual DbSet<Appointment> Appointments { get; set; }
 
-    public virtual DbSet<Appointmentservice> Appointmentservices { get; set; }
+    public virtual DbSet<AppointmentService> AppointmentServices { get; set; }
 
     public virtual DbSet<Business> Businesses { get; set; }
 
@@ -25,7 +25,7 @@ public partial class obrnDbContext : DbContext
 
     public virtual DbSet<Discount> Discounts { get; set; }
 
-    public virtual DbSet<Feeandcommission> Feeandcommissions { get; set; }
+    public virtual DbSet<FeeAndCommission> FeeAndCommissions { get; set; }
 
     public virtual DbSet<Referral> Referrals { get; set; }
 
@@ -49,321 +49,252 @@ public partial class obrnDbContext : DbContext
 
         modelBuilder.Entity<Appointment>(entity =>
         {
-            entity.HasKey(e => e.Pkappointmentid).HasName("appointment_pkey");
+            entity.HasKey(e => e.PkAppointmentId).HasName("Appointment_pkey");
 
-            entity.ToTable("appointment");
+            entity.ToTable("Appointment");
 
-            entity.Property(e => e.Pkappointmentid).HasColumnName("pkappointmentid");
-            entity.Property(e => e.Appointmentdate).HasColumnName("appointmentdate");
-            entity.Property(e => e.Appointmenttime).HasColumnName("appointmenttime");
-            entity.Property(e => e.Fkcustomerid).HasColumnName("fkcustomerid");
-            entity.Property(e => e.Fkserviceid).HasColumnName("fkserviceid");
-            entity.Property(e => e.Paymentstatus)
-                .HasMaxLength(1)
-                .HasColumnName("paymentstatus");
+            entity.Property(e => e.PkAppointmentId).HasColumnName("pkAppointmentID");
+            entity.Property(e => e.FkCustomerId)
+                .HasMaxLength(20)
+                .HasColumnName("fkCustomerID");
+            entity.Property(e => e.FkServiceId).HasColumnName("fkServiceID");
+            entity.Property(e => e.Referred).HasDefaultValue(false);
 
-            entity.HasOne(d => d.Fkcustomer).WithMany(p => p.Appointments)
-                .HasForeignKey(d => d.Fkcustomerid)
+            entity.HasOne(d => d.FkCustomer).WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.FkCustomerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("appointment_fkcustomerid_fkey");
+                .HasConstraintName("Appointment_fkCustomerID_fkey");
 
-            entity.HasOne(d => d.Fkservice).WithMany(p => p.Appointments)
-                .HasForeignKey(d => d.Fkserviceid)
+            entity.HasOne(d => d.FkService).WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.FkServiceId)
                 .HasConstraintName("fk_appointment_service_id");
         });
 
-        modelBuilder.Entity<Appointmentservice>(entity =>
+        modelBuilder.Entity<AppointmentService>(entity =>
         {
-            entity.HasKey(e => e.Pkappointmentserviceid).HasName("appointmentservice_pkey");
+            entity.HasKey(e => e.PkAppointmentServiceId).HasName("AppointmentService_pkey");
 
-            entity.ToTable("appointmentservice");
+            entity.ToTable("AppointmentService");
 
-            entity.Property(e => e.Pkappointmentserviceid).HasColumnName("pkappointmentserviceid");
-            entity.Property(e => e.Fkappointmentid).HasColumnName("fkappointmentid");
-            entity.Property(e => e.Fkserviceid).HasColumnName("fkserviceid");
+            entity.Property(e => e.PkAppointmentServiceId).HasColumnName("pkAppointmentServiceID");
+            entity.Property(e => e.FkAppointmentId).HasColumnName("fkAppointmentID");
+            entity.Property(e => e.FkServiceId).HasColumnName("fkServiceID");
 
-            entity.HasOne(d => d.Fkappointment).WithMany(p => p.Appointmentservices)
-                .HasForeignKey(d => d.Fkappointmentid)
+            entity.HasOne(d => d.FkAppointment).WithMany(p => p.AppointmentServices)
+                .HasForeignKey(d => d.FkAppointmentId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_appointment_id");
         });
 
         modelBuilder.Entity<Business>(entity =>
         {
-            entity.HasKey(e => e.Pkbusinessid).HasName("business_pkey");
+            entity.HasKey(e => e.PkBusinessId).HasName("Business_pkey");
 
-            entity.ToTable("business");
+            entity.ToTable("Business");
 
-            entity.Property(e => e.Pkbusinessid).HasColumnName("pkbusinessid");
-            entity.Property(e => e.Address)
-                .HasMaxLength(255)
-                .HasColumnName("address");
-            entity.Property(e => e.City)
-                .HasMaxLength(255)
-                .HasColumnName("city");
-            entity.Property(e => e.Commissionpaid)
-                .HasMaxLength(1)
-                .HasColumnName("commissionpaid");
-            entity.Property(e => e.Contactname)
-                .HasMaxLength(255)
-                .HasColumnName("contactname");
-            entity.Property(e => e.Description)
-                .HasMaxLength(1200)
-                .HasColumnName("description");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.Insurancecompany)
-                .HasMaxLength(255)
-                .HasColumnName("insurancecompany");
-            entity.Property(e => e.Insuranceexpirydate).HasColumnName("insuranceexpirydate");
-            entity.Property(e => e.Isverified)
-                .HasMaxLength(1)
-                .HasColumnName("isverified");
-            entity.Property(e => e.Logo)
-                .HasMaxLength(255)
-                .HasColumnName("logo");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-            entity.Property(e => e.Phone)
-                .HasMaxLength(20)
-                .HasColumnName("phone");
-            entity.Property(e => e.Postalcode)
-                .HasMaxLength(255)
-                .HasColumnName("postalcode");
-            entity.Property(e => e.Province)
-                .HasMaxLength(255)
-                .HasColumnName("province");
-            entity.Property(e => e.Registrationdate).HasColumnName("registrationdate");
-            entity.Property(e => e.Verificationdocument)
-                .HasMaxLength(255)
-                .HasColumnName("verificationdocument");
+            entity.Property(e => e.PkBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("pkBusinessID");
+            entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.BusinessName).HasMaxLength(255);
+            entity.Property(e => e.City).HasMaxLength(255);
+            entity.Property(e => e.CommissionPaid).HasDefaultValue(false);
+            entity.Property(e => e.ContactName).HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(1200);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.InsuranceCompany).HasMaxLength(255);
+            entity.Property(e => e.IsVerified).HasDefaultValue(false);
+            entity.Property(e => e.Logo).HasMaxLength(255);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.PostalCode).HasMaxLength(255);
+            entity.Property(e => e.Province).HasMaxLength(255);
+            entity.Property(e => e.VerificationDocument).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.Pkcustomerid).HasName("customer_pkey");
+            entity.HasKey(e => e.PkCustomerId).HasName("Customer_pkey");
 
-            entity.ToTable("customer");
+            entity.ToTable("Customer");
 
-            entity.HasIndex(e => e.Email, "customer_email_key").IsUnique();
+            entity.HasIndex(e => e.Email, "Customer_Email_key").IsUnique();
 
-            entity.Property(e => e.Pkcustomerid).HasColumnName("pkcustomerid");
-            entity.Property(e => e.Address)
-                .HasMaxLength(255)
-                .HasColumnName("address");
-            entity.Property(e => e.Birthdate).HasColumnName("birthdate");
-            entity.Property(e => e.City)
-                .HasMaxLength(255)
-                .HasColumnName("city");
-            entity.Property(e => e.Confirm18)
-                .HasMaxLength(1)
-                .HasColumnName("confirm18");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.Firstname)
-                .HasMaxLength(255)
-                .HasColumnName("firstname");
-            entity.Property(e => e.Lastname)
-                .HasMaxLength(255)
-                .HasColumnName("lastname");
-            entity.Property(e => e.Phone)
+            entity.Property(e => e.PkCustomerId)
                 .HasMaxLength(20)
-                .HasColumnName("phone");
-            entity.Property(e => e.Photo)
-                .HasMaxLength(255)
-                .HasColumnName("photo");
-            entity.Property(e => e.Postalcode)
-                .HasMaxLength(255)
-                .HasColumnName("postalcode");
-            entity.Property(e => e.Province)
-                .HasMaxLength(255)
-                .HasColumnName("province");
+                .HasColumnName("pkCustomerID");
+            entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.City).HasMaxLength(255);
+            entity.Property(e => e.Confirm18).HasDefaultValue(false);
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.FirstName).HasMaxLength(255);
+            entity.Property(e => e.LastName).HasMaxLength(255);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.Photo).HasMaxLength(255);
+            entity.Property(e => e.PostalCode).HasMaxLength(255);
+            entity.Property(e => e.Province).HasMaxLength(255);
             entity.Property(e => e.Qr)
                 .HasMaxLength(255)
-                .HasColumnName("qr");
+                .HasColumnName("QR");
             entity.Property(e => e.Vip)
-                .HasMaxLength(1)
-                .HasColumnName("vip");
+                .HasDefaultValue(false)
+                .HasColumnName("VIP");
         });
 
         modelBuilder.Entity<Discount>(entity =>
         {
-            entity.HasKey(e => e.Pkdiscountid).HasName("discount_pkey");
+            entity.HasKey(e => e.PkDiscountId).HasName("Discount_pkey");
 
-            entity.ToTable("discount");
+            entity.ToTable("Discount");
 
-            entity.Property(e => e.Pkdiscountid)
+            entity.Property(e => e.PkDiscountId)
                 .HasMaxLength(5)
-                .HasColumnName("pkdiscountid");
-            entity.Property(e => e.Amount).HasColumnName("amount");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Image)
-                .HasMaxLength(255)
-                .HasColumnName("image");
-            entity.Property(e => e.Percent).HasColumnName("percent");
+                .HasColumnName("pkDiscountID");
         });
 
-        modelBuilder.Entity<Feeandcommission>(entity =>
+        modelBuilder.Entity<FeeAndCommission>(entity =>
         {
-            entity.HasKey(e => e.Pkfeeid).HasName("feeandcommission_pkey");
+            entity.HasKey(e => e.PkFeeId).HasName("FeeAndCommission_pkey");
 
-            entity.ToTable("feeandcommission");
+            entity.ToTable("FeeAndCommission");
 
-            entity.Property(e => e.Pkfeeid)
+            entity.Property(e => e.PkFeeId)
                 .HasMaxLength(4)
-                .HasColumnName("pkfeeid");
-            entity.Property(e => e.Amount).HasColumnName("amount");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Feetype)
+                .HasColumnName("pkFeeID");
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.FeeType)
                 .HasMaxLength(12)
-                .IsFixedLength()
-                .HasColumnName("feetype");
+                .IsFixedLength();
             entity.Property(e => e.Frequency)
                 .HasMaxLength(8)
-                .IsFixedLength()
-                .HasColumnName("frequency");
-            entity.Property(e => e.Percent).HasColumnName("percent");
+                .IsFixedLength();
         });
 
         modelBuilder.Entity<Referral>(entity =>
         {
-            entity.HasKey(e => e.Pkreferralid).HasName("referral_pkey");
+            entity.HasKey(e => e.PkReferralId).HasName("Referral_pkey");
 
-            entity.ToTable("referral");
+            entity.ToTable("Referral");
 
-            entity.Property(e => e.Pkreferralid).HasColumnName("pkreferralid");
-            entity.Property(e => e.Fkreferredbusinessid).HasColumnName("fkreferredbusinessid");
-            entity.Property(e => e.Fkreferredcustomerid).HasColumnName("fkreferredcustomerid");
-            entity.Property(e => e.Fkreferrerbusinessid).HasColumnName("fkreferrerbusinessid");
-            entity.Property(e => e.Fkreferrercustomerid).HasColumnName("fkreferrercustomerid");
-            entity.Property(e => e.Referraldate).HasColumnName("referraldate");
-            entity.Property(e => e.Referredtype)
-                .HasMaxLength(1)
-                .HasColumnName("referredtype");
-            entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .HasColumnName("status");
+            entity.Property(e => e.PkReferralId).HasColumnName("pkReferralID");
+            entity.Property(e => e.FkReferredBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkReferredBusinessID");
+            entity.Property(e => e.FkReferredCustomerId)
+                .HasMaxLength(20)
+                .HasColumnName("fkReferredCustomerID");
+            entity.Property(e => e.FkReferrerBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkReferrerBusinessID");
+            entity.Property(e => e.FkReferrerCustomerId)
+                .HasMaxLength(20)
+                .HasColumnName("fkReferrerCustomerID");
+            entity.Property(e => e.ReferredType).HasMaxLength(1);
+            entity.Property(e => e.Status).HasMaxLength(50);
 
-            entity.HasOne(d => d.Fkreferredbusiness).WithMany(p => p.ReferralFkreferredbusinesses)
-                .HasForeignKey(d => d.Fkreferredbusinessid)
-                .HasConstraintName("referral_fkreferredbusinessid_fkey");
+            entity.HasOne(d => d.FkReferredBusiness).WithMany(p => p.ReferralFkReferredBusinesses)
+                .HasForeignKey(d => d.FkReferredBusinessId)
+                .HasConstraintName("Referral_fkReferredBusinessID_fkey");
 
-            entity.HasOne(d => d.Fkreferredcustomer).WithMany(p => p.ReferralFkreferredcustomers)
-                .HasForeignKey(d => d.Fkreferredcustomerid)
-                .HasConstraintName("referral_fkreferredcustomerid_fkey");
+            entity.HasOne(d => d.FkReferredCustomer).WithMany(p => p.ReferralFkReferredCustomers)
+                .HasForeignKey(d => d.FkReferredCustomerId)
+                .HasConstraintName("Referral_fkReferredCustomerID_fkey");
 
-            entity.HasOne(d => d.Fkreferrerbusiness).WithMany(p => p.ReferralFkreferrerbusinesses)
-                .HasForeignKey(d => d.Fkreferrerbusinessid)
-                .HasConstraintName("referral_fkreferrerbusinessid_fkey");
+            entity.HasOne(d => d.FkReferrerBusiness).WithMany(p => p.ReferralFkReferrerBusinesses)
+                .HasForeignKey(d => d.FkReferrerBusinessId)
+                .HasConstraintName("Referral_fkReferrerBusinessID_fkey");
 
-            entity.HasOne(d => d.Fkreferrercustomer).WithMany(p => p.ReferralFkreferrercustomers)
-                .HasForeignKey(d => d.Fkreferrercustomerid)
-                .HasConstraintName("referral_fkreferrercustomerid_fkey");
+            entity.HasOne(d => d.FkReferrerCustomer).WithMany(p => p.ReferralFkReferrerCustomers)
+                .HasForeignKey(d => d.FkReferrerCustomerId)
+                .HasConstraintName("Referral_fkReferrerCustomerID_fkey");
         });
 
         modelBuilder.Entity<Review>(entity =>
         {
-            entity.HasKey(e => e.Pkreviewid).HasName("review_pkey");
+            entity.HasKey(e => e.PkReviewId).HasName("Review_pkey");
 
-            entity.ToTable("review");
+            entity.ToTable("Review");
 
-            entity.Property(e => e.Pkreviewid).HasColumnName("pkreviewid");
-            entity.Property(e => e.Date).HasColumnName("date");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Fkbusinessid).HasColumnName("fkbusinessid");
-            entity.Property(e => e.Fkcustomerid).HasColumnName("fkcustomerid");
-            entity.Property(e => e.Image)
-                .HasMaxLength(255)
-                .HasColumnName("image");
-            entity.Property(e => e.Provider)
-                .HasMaxLength(255)
-                .HasColumnName("provider");
-            entity.Property(e => e.Rating).HasColumnName("rating");
+            entity.Property(e => e.PkReviewId).HasColumnName("pkReviewId");
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.FkBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkBusinessID");
+            entity.Property(e => e.FkCustomerId)
+                .HasMaxLength(20)
+                .HasColumnName("fkCustomerID");
+            entity.Property(e => e.Image).HasMaxLength(255);
+            entity.Property(e => e.Provider).HasMaxLength(255);
 
-            entity.HasOne(d => d.Fkbusiness).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.Fkbusinessid)
+            entity.HasOne(d => d.FkBusiness).WithMany(p => p.Reviews)
+                .HasForeignKey(d => d.FkBusinessId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("review_fkbusinessid_fkey");
+                .HasConstraintName("Review_fkBusinessID_fkey");
 
-            entity.HasOne(d => d.Fkcustomer).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.Fkcustomerid)
+            entity.HasOne(d => d.FkCustomer).WithMany(p => p.Reviews)
+                .HasForeignKey(d => d.FkCustomerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("review_fkcustomerid_fkey");
+                .HasConstraintName("Review_fkCustomerID_fkey");
         });
 
         modelBuilder.Entity<Reward>(entity =>
         {
-            entity.HasKey(e => e.Pkrewardid).HasName("reward_pkey");
+            entity.HasKey(e => e.PkRewardId).HasName("Reward_pkey");
 
-            entity.ToTable("reward");
+            entity.ToTable("Reward");
 
-            entity.Property(e => e.Pkrewardid).HasColumnName("pkrewardid");
-            entity.Property(e => e.Fkreferralid).HasColumnName("fkreferralid");
-            entity.Property(e => e.Issuedate).HasColumnName("issuedate");
-            entity.Property(e => e.Rewardamount).HasColumnName("rewardamount");
+            entity.Property(e => e.PkRewardId).HasColumnName("pkRewardID");
+            entity.Property(e => e.FkReferralId).HasColumnName("fkReferralID");
 
-            entity.HasOne(d => d.Fkreferral).WithMany(p => p.Rewards)
-                .HasForeignKey(d => d.Fkreferralid)
+            entity.HasOne(d => d.FkReferral).WithMany(p => p.Rewards)
+                .HasForeignKey(d => d.FkReferralId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("reward_fkreferralid_fkey");
+                .HasConstraintName("Reward_fkReferralID_fkey");
         });
 
         modelBuilder.Entity<Service>(entity =>
         {
-            entity.HasKey(e => e.Pkserviceid).HasName("service_pkey");
+            entity.HasKey(e => e.PkServiceId).HasName("Service_pkey");
 
-            entity.ToTable("service");
+            entity.ToTable("Service");
 
-            entity.Property(e => e.Pkserviceid).HasColumnName("pkserviceid");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Fkbusinessid).HasColumnName("fkbusinessid");
-            entity.Property(e => e.Fkdiscountid)
+            entity.Property(e => e.PkServiceId).HasColumnName("pkServiceID");
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.FkBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkBusinessID");
+            entity.Property(e => e.FkDiscountId)
                 .HasMaxLength(5)
-                .HasColumnName("fkdiscountid");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
+                .HasColumnName("fkDiscountID");
+            entity.Property(e => e.Image).HasMaxLength(255);
+            entity.Property(e => e.ServiceName).HasMaxLength(255);
 
-            entity.HasOne(d => d.Fkbusiness).WithMany(p => p.Services)
-                .HasForeignKey(d => d.Fkbusinessid)
+            entity.HasOne(d => d.FkBusiness).WithMany(p => p.Services)
+                .HasForeignKey(d => d.FkBusinessId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("service_fkbusinessid_fkey");
+                .HasConstraintName("Service_fkBusinessID_fkey");
 
-            entity.HasOne(d => d.Fkdiscount).WithMany(p => p.Services)
-                .HasForeignKey(d => d.Fkdiscountid)
+            entity.HasOne(d => d.FkDiscount).WithMany(p => p.Services)
+                .HasForeignKey(d => d.FkDiscountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("service_fkdiscountid_fkey");
+                .HasConstraintName("Service_fkDiscountID_fkey");
         });
 
         modelBuilder.Entity<Testimonial>(entity =>
         {
-            entity.HasKey(e => e.Pktestimonialid).HasName("testimonial_pkey");
+            entity.HasKey(e => e.PkTestimonialId).HasName("Testimonial_pkey");
 
-            entity.ToTable("testimonial");
+            entity.ToTable("Testimonial");
 
-            entity.Property(e => e.Pktestimonialid).HasColumnName("pktestimonialid");
-            entity.Property(e => e.Date).HasColumnName("date");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Fkbusinessid).HasColumnName("fkbusinessid");
-            entity.Property(e => e.Rating).HasColumnName("rating");
+            entity.Property(e => e.PkTestimonialId).HasColumnName("pkTestimonialId");
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.FkBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkBusinessID");
 
-            entity.HasOne(d => d.Fkbusiness).WithMany(p => p.Testimonials)
-                .HasForeignKey(d => d.Fkbusinessid)
+            entity.HasOne(d => d.FkBusiness).WithMany(p => p.Testimonials)
+                .HasForeignKey(d => d.FkBusinessId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("testimonial_fkbusinessid_fkey");
+                .HasConstraintName("Testimonial_fkBusinessID_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

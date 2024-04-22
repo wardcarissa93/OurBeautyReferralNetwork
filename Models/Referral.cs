@@ -5,29 +5,29 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Referral
 {
-    public int Pkreferralid { get; set; }
+    public int PkReferralId { get; set; }
 
-    public string? Fkreferrercustomerid { get; set; }
+    public string? FkReferrerCustomerId { get; set; }
 
-    public string? Fkreferredcustomerid { get; set; }
+    public string? FkReferredCustomerId { get; set; }
 
-    public string? Fkreferrerbusinessid { get; set; }
+    public string? FkReferrerBusinessId { get; set; }
 
-    public string? Fkreferredbusinessid { get; set; }
+    public string? FkReferredBusinessId { get; set; }
 
-    public DateOnly Referraldate { get; set; }
+    public DateOnly ReferralDate { get; set; }
 
     public string Status { get; set; } = null!;
 
-    public string Referredtype { get; set; } = null!;
+    public string ReferredType { get; set; } = null!;
 
-    public virtual Business? Fkreferredbusiness { get; set; }
+    public virtual Business? FkReferredBusiness { get; set; }
 
-    public virtual Customer? Fkreferredcustomer { get; set; }
+    public virtual Customer? FkReferredCustomer { get; set; }
 
-    public virtual Business? Fkreferrerbusiness { get; set; }
+    public virtual Business? FkReferrerBusiness { get; set; }
 
-    public virtual Customer? Fkreferrercustomer { get; set; }
+    public virtual Customer? FkReferrerCustomer { get; set; }
 
     public virtual ICollection<Reward> Rewards { get; set; } = new List<Reward>();
 }

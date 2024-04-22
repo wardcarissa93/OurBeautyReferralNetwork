@@ -5,13 +5,13 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Business
 {
-    public required string Pkbusinessid { get; set; }
+    public string PkBusinessId { get; set; } = null!;
 
-    public string Name { get; set; } = null!;
+    public string BusinessName { get; set; } = null!;
 
     public string Logo { get; set; } = null!;
 
-    public string Contactname { get; set; } = null!;
+    public string ContactName { get; set; } = null!;
 
     public string Address { get; set; } = null!;
 
@@ -19,29 +19,29 @@ public partial class Business
 
     public string Province { get; set; } = null!;
 
-    public string Postalcode { get; set; } = null!;
+    public string PostalCode { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
     public string Phone { get; set; } = null!;
 
-    public string Insurancecompany { get; set; } = null!;
+    public string InsuranceCompany { get; set; } = null!;
 
-    public DateOnly Insuranceexpirydate { get; set; }
+    public DateOnly InsuranceExpiryDate { get; set; }
 
-    public DateOnly Registrationdate { get; set; }
+    public DateOnly RegistrationDate { get; set; }
 
-    public char Commissionpaid { get; set; }
+    public bool CommissionPaid { get; set; }
 
     public string? Description { get; set; }
 
-    public string Verificationdocument { get; set; } = null!;
+    public string VerificationDocument { get; set; } = null!;
 
-    public char Isverified { get; set; }
+    public bool IsVerified { get; set; }
 
-    public virtual ICollection<Referral> ReferralFkreferredbusinesses { get; set; } = new List<Referral>();
+    public virtual ICollection<Referral> ReferralFkReferredBusinesses { get; set; } = new List<Referral>();
 
-    public virtual ICollection<Referral> ReferralFkreferrerbusinesses { get; set; } = new List<Referral>();
+    public virtual ICollection<Referral> ReferralFkReferrerBusinesses { get; set; } = new List<Referral>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
