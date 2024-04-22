@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Utilities;
-using System;
-using System.Threading.Tasks;
+
 
 namespace OurBeautyReferralNetwork.Repositories
 {
@@ -11,12 +11,15 @@ namespace OurBeautyReferralNetwork.Repositories
     {
         private readonly JWTUtilities _jWTUtilities;
         private readonly obrnDbContext _obrnDbContext;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public CustomerRepo(JWTUtilities jWTUtilities,
-                            obrnDbContext obrnDbContext)
+                            obrnDbContext obrnDbContext,
+                            UserManager<IdentityUser> userManager)
         {
-            this._jWTUtilities = jWTUtilities;
+            _jWTUtilities = jWTUtilities;
             _obrnDbContext = obrnDbContext;
+            _userManager = userManager;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -25,17 +28,42 @@ namespace OurBeautyReferralNetwork.Repositories
             return customers;
         }
 
-        public async Task<IActionResult> AddCustomer(Customer customer)
+        public async Task<IActionResult> AddCustomer(RegisterCustomer customer)
         {
             try
             {
-                _obrnDbContext.Customers.Add(customer);
+                Customer newCustomer = new Customer
+                {
+                    PkCustomerId = customer.PkCustomerId,
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName,
+                    Phone = customer.Phone,
+                    Birthdate = customer.Birthdate,
+                    Email = customer.Email,
+                    Vip = customer.Vip,
+                    Confirm18 = customer.Confirm18
+                };
+
+                _obrnDbContext.Customers.Add(newCustomer);
                 await _obrnDbContext.SaveChangesAsync();
 
-                // Generate JWT for the added customer
-                var token = _jWTUtilities.GenerateJwtToken(customer.Email);
+                var user = new IdentityUser
+                {
+                    UserName = customer.PkCustomerId,
+                    Email = customer.Email
+                };
 
-                return new OkObjectResult(new { Message = "Customer added successfully", Token = token });
+                var result = await _userManager.CreateAsync(user, customer.Password);
+
+                if (result.Succeeded)
+                {
+                    // Generate JWT for the added customer
+                    var token = _jWTUtilities.GenerateJwtToken(customer.Email);
+
+                    return new OkObjectResult(new { Message = "Customer added successfully", Token = token });
+                }
+
+                return new BadRequestObjectResult(new { Errors = result.Errors });
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
@@ -34,7 +35,7 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPost("addcustomer")]
-        public async Task<IActionResult> AddCustomer(Customer model)
+        public async Task<IActionResult> AddCustomer(RegisterCustomer model)
         {
             var result = await _customerRepo.AddCustomer(model);
             return result;
