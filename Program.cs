@@ -29,21 +29,21 @@ builder.Services.AddScoped<CustomerRepo>();
 builder.Services.AddScoped<JWTUtilities>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block
-using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
-{
-    // Connect to the database
-    conn.Open();
+//using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+//{
+//    // Connect to the database
+//    conn.Open();
 
-    // Read rows
-    NpgsqlCommand selectCommand = new NpgsqlCommand("SELECT * FROM FeeAndCommission", conn);
-    NpgsqlDataReader results = selectCommand.ExecuteReader();
+//    // Read rows
+//    NpgsqlCommand selectCommand = new NpgsqlCommand("SELECT * FROM FeeAndCommission", conn);
+//    NpgsqlDataReader results = selectCommand.ExecuteReader();
 
-    // Enumerate over the rows
-    while (results.Read())
-    {
-        Console.WriteLine("Column 0: {0} Column 1: {1}", results[0], results[1]);
-    }
-}
+//    // Enumerate over the rows
+//    while (results.Read())
+//    {
+//        Console.WriteLine("Column 0: {0} Column 1: {1}", results[0], results[1]);
+//    }
+//}
 
 // Generate random JWT key
 var jwtKey = JWTUtilities.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)

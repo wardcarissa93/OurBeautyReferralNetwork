@@ -8,6 +8,7 @@ using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace OurBeautyReferralNetwork.Controllers
 {
@@ -37,7 +38,11 @@ namespace OurBeautyReferralNetwork.Controllers
 
         public virtual IActionResult GetFee([FromRoute][Required] string feeId)
         {
-            var fee = _obrnContext.Feeandcommissions.FirstOrDefault();
+            var fee = _obrnContext.FeeAndCommissions.FirstOrDefault(f => f.PkFeeId == feeId);
+            if (fee == null)
+            {
+                return NotFound(); // Return a 404 Not Found response if feeId does not exist
+            }
             return Ok(fee);
         }
 
@@ -47,7 +52,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [SwaggerOperation("FeeGet")]
         public virtual IActionResult FeeGet()
         {
-            var fees = _obrnContext.Feeandcommissions.ToList();
+            var fees = _obrnContext.FeeAndCommissions.ToList();
             return Ok(fees);
         }
     }

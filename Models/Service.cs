@@ -5,17 +5,21 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Service
 {
-    public int Pkserviceid { get; set; }
+    public int PkServiceId { get; set; }
 
-    public string Fkbusinessid { get; set; }
+    public string Image { get; set; } = null!;
 
-    public string Name { get; set; } = null!;
+    public string FkBusinessId { get; set; } = null!;
+
+    public string ServiceName { get; set; } = null!;
 
     public string Description { get; set; } = null!;
 
-    public string Fkdiscountid { get; set; } = null!;
+    public string FkDiscountId { get; set; } = null!;
 
-    public virtual Business Fkbusiness { get; set; } = null!;
+    public decimal? Price { get; set; }
 
-    public virtual Discount Fkdiscount { get; set; } = null!;
+    public virtual Business FkBusiness { get; set; } = null!;
+
+    public virtual Discount FkDiscount { get; set; } = null!;
 }

@@ -5,15 +5,15 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Testimonial
 {
-    public int Pktestimonialid { get; set; }
+    public int PkTestimonialId { get; set; }
 
-    public string Fkbusinessid { get; set; }
+    public string FkBusinessId { get; set; } = null!;
 
     public string Description { get; set; } = null!;
 
     public decimal Rating { get; set; }
 
-    public DateOnly Date { get; set; }
+    public DateOnly TestimonialDate { get; set; }
 
-    public virtual Business Fkbusiness { get; set; } = null!;
+    public virtual Business FkBusiness { get; set; } = null!;
 }

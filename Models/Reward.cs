@@ -5,13 +5,13 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Reward
 {
-    public int Pkrewardid { get; set; }
+    public int PkRewardId { get; set; }
 
-    public int Fkreferralid { get; set; }
+    public int FkReferralId { get; set; }
 
-    public decimal Rewardamount { get; set; }
+    public decimal RewardAmount { get; set; }
 
-    public DateOnly Issuedate { get; set; }
+    public DateOnly IssueDate { get; set; }
 
-    public virtual Referral Fkreferral { get; set; } = null!;
+    public virtual Referral FkReferral { get; set; } = null!;
 }
