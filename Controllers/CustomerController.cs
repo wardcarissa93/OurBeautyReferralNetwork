@@ -16,17 +16,14 @@ namespace OurBeautyReferralNetwork.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly CustomerRepo _customerRepo;
-        private readonly JWTUtilities _jwtUtilities;
 
         public CustomerController(ApplicationDbContext context,
                                   IConfiguration configuration,
-                                  CustomerRepo customerRepo,
-                                  JWTUtilities jWTUtilities)
+                                  CustomerRepo customerRepo)
         {
             _context = context;
             _configuration = configuration;
             _customerRepo = customerRepo;
-            _jwtUtilities = jWTUtilities;
         }
 
         [HttpGet("getcustomers")]

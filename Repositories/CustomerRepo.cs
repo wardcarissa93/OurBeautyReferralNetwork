@@ -9,19 +9,19 @@ namespace OurBeautyReferralNetwork.Repositories
 {
     public class CustomerRepo
     {
-        private readonly ApplicationDbContext _context;
         private readonly JWTUtilities _jWTUtilities;
+        private readonly obrnDbContext _obrnDbContext;
 
-        public CustomerRepo(ApplicationDbContext context,
-                            JWTUtilities jWTUtilities)
+        public CustomerRepo(JWTUtilities jWTUtilities,
+                            obrnDbContext obrnDbContext)
         {
-            this._context = context;
             this._jWTUtilities = jWTUtilities;
+            _obrnDbContext = obrnDbContext;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
         {
-            IEnumerable<Customer> customers = _context.Customers.ToList();
+            IEnumerable<Customer> customers = _obrnDbContext.Customers.ToList();
             return customers;
         }
 
@@ -29,8 +29,8 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                _context.Customers.Add(customer);
-                await _context.SaveChangesAsync();
+                _obrnDbContext.Customers.Add(customer);
+                await _obrnDbContext.SaveChangesAsync();
 
                 // Generate JWT for the added customer
                 var token = _jWTUtilities.GenerateJwtToken(customer.Email);
