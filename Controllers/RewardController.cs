@@ -37,7 +37,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [HttpGet]
         [Route("/reward/{rewardId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] int rewardId)
+        public virtual IActionResult GetRewardById([FromRoute][Required] int rewardId)
         {
             RewardRepo rewardRepo = new RewardRepo(_context, _obrnContext);
 
