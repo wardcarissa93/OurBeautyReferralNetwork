@@ -17,14 +17,14 @@ namespace OurBeautyReferralNetwork.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class FeeController : ControllerBase
+    public class ReviewController : ControllerBase
     {
 
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public FeeController(ApplicationDbContext context, obrnDbContext obrnContext,
+        public ReviewController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
@@ -35,29 +35,28 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/fee/{feeId}")]
+        [Route("/review/{reviewId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] string feeId)
+        public virtual IActionResult GetReviewById([FromRoute][Required] int reviewId)
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fee = feeRepo.GetFeeById(feeId);
-            if (fee != null)
+            ReviewRepo reviewRepo = new ReviewRepo(_context, _obrnContext);
+            var review = reviewRepo.GetReviewById(reviewId);
+            if (review == null)
             {
-                return Ok(fee);
-
+                return NotFound(); // Return a 404 Not Found response if discountId does not exist
             }
-            return NotFound("Fee not found");
+            return Ok(review);
         }
 
         [HttpGet]
-        [Route("/fee")]
+        [Route("/review")]
         //[ValidateModelState]
-        [SwaggerOperation("FeeGet")]
-        public virtual IActionResult FeeGet()
+        [SwaggerOperation("ReviewGet")]
+        public virtual IActionResult ReviewGet()
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fees = feeRepo.GetAllFees();
-            return Ok(fees);
+            ReviewRepo reviewRepo = new ReviewRepo(_context, _obrnContext);
+            var reviews = reviewRepo.GetAllReviews();
+            return Ok(reviews);
         }
     }
 }

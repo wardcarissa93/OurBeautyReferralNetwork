@@ -17,14 +17,14 @@ namespace OurBeautyReferralNetwork.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class FeeController : ControllerBase
+    public class TestimonialController : ControllerBase
     {
 
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public FeeController(ApplicationDbContext context, obrnDbContext obrnContext,
+        public TestimonialController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
@@ -35,29 +35,29 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/fee/{feeId}")]
+        [Route("/testimonial/{testimonialId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] string feeId)
+        public virtual IActionResult GetFee([FromRoute][Required] int testimonialId)
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fee = feeRepo.GetFeeById(feeId);
-            if (fee != null)
-            {
-                return Ok(fee);
+            TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
 
+            var testimonial = testimonialRepo.GetTestimonialById(testimonialId);
+            if (testimonial == null)
+            {
+                return NotFound(); // Return a 404 Not Found response if testimonialId does not exist
             }
-            return NotFound("Fee not found");
+            return Ok(testimonial);
         }
 
         [HttpGet]
-        [Route("/fee")]
+        [Route("/testimonial")]
         //[ValidateModelState]
-        [SwaggerOperation("FeeGet")]
-        public virtual IActionResult FeeGet()
+        [SwaggerOperation("TestimonialGet")]
+        public virtual IActionResult TestimonialGet()
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fees = feeRepo.GetAllFees();
-            return Ok(fees);
+            TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
+            var testimonials = testimonialRepo.GetAllTestimonials();
+            return Ok(testimonials);
         }
     }
 }

@@ -17,14 +17,14 @@ namespace OurBeautyReferralNetwork.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class FeeController : ControllerBase
+    public class AppointmentController : ControllerBase
     {
 
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public FeeController(ApplicationDbContext context, obrnDbContext obrnContext,
+        public AppointmentController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
@@ -35,29 +35,28 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/fee/{feeId}")]
+        [Route("/appointment/{appointmentId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] string feeId)
+        public virtual IActionResult GetAppointmentById([FromRoute][Required] int appointmentId)
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fee = feeRepo.GetFeeById(feeId);
-            if (fee != null)
+            AppointmentRepo appointmentRepo = new AppointmentRepo(_context, _obrnContext);
+            var appointment = appointmentRepo.GetAppointmentById(appointmentId);
+            if (appointment == null)
             {
-                return Ok(fee);
-
+                return NotFound(); // Return a 404 Not Found response if feeId does not exist
             }
-            return NotFound("Fee not found");
+            return Ok(appointment);
         }
 
         [HttpGet]
-        [Route("/fee")]
+        [Route("/appointment")]
         //[ValidateModelState]
-        [SwaggerOperation("FeeGet")]
-        public virtual IActionResult FeeGet()
+        [SwaggerOperation("AppointmentGet")]
+        public virtual IActionResult AppointmentGet()
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fees = feeRepo.GetAllFees();
-            return Ok(fees);
+            AppointmentRepo appointmentRepo = new AppointmentRepo(_context, _obrnContext);
+            var appointments = appointmentRepo.GetAllAppointments();
+            return Ok(appointments);
         }
     }
 }
