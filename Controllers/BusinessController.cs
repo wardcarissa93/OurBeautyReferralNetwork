@@ -7,11 +7,11 @@ namespace OurBeautyReferralNetwork.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TempBusinessController : ControllerBase
+    public class BusinessController : ControllerBase
     {
         private readonly BusinessRepo _businessRepo;
 
-        public TempBusinessController(BusinessRepo businessRepo)
+        public BusinessController(BusinessRepo businessRepo)
         {
             _businessRepo = businessRepo;
         }

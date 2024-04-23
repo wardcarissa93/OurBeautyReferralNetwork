@@ -34,6 +34,13 @@ namespace OurBeautyReferralNetwork.Controllers
             return Ok(customers);
         }
 
+        [HttpGet("getcustomer/{id}")]
+        public async Task<IActionResult> GetCustomerById(string id)
+        {
+            var result = await _customerRepo.GetCustomerById(id);
+            return result;
+        }
+
         [HttpPost("addcustomer")]
         public async Task<IActionResult> AddCustomer(RegisterCustomer model)
         {
