@@ -132,5 +132,38 @@ namespace OurBeautyReferralNetwork.Repositories
             return new BadRequestObjectResult(new { Message = "Invalid email or password" });
         }
 
+        public async Task<IActionResult> EditCustomer(Customer customer)
+        {
+            try
+            {
+                // Check if the customer exists in the database
+                var existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
+                if (existingCustomer == null)
+                {
+                    return new NotFoundObjectResult("Customer not found");
+                }
+
+                // Update the customer's properties
+                existingCustomer.FirstName = customer.FirstName;
+                existingCustomer.LastName = customer.LastName;
+                existingCustomer.Address = customer.Address;
+                existingCustomer.City = customer.City;
+                existingCustomer.Province = customer.Province;
+                existingCustomer.PostalCode = customer.PostalCode;
+                existingCustomer.Phone = customer.Phone;
+                existingCustomer.Birthdate = customer.Birthdate;
+                existingCustomer.Email = customer.Email;
+                existingCustomer.Vip = customer.Vip;
+
+                // Save changes to the database
+                await _obrnDbContext.SaveChangesAsync();
+
+                return new OkObjectResult("Customer updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error editing customer: {ex.Message}");
+            }
+        }
     }
 }

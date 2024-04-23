@@ -61,5 +61,12 @@ namespace OurBeautyReferralNetwork.Controllers
             var result = await _customerRepo.Login(model);
             return result;
         }
+
+        [HttpPost("editcustomer")]
+        public async Task<IActionResult> EditCustomer(Customer customer)
+        {
+            var result = await _customerRepo.EditCustomer(customer);
+            return result;
+        }
     }
 }
