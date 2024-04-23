@@ -17,14 +17,14 @@ namespace OurBeautyReferralNetwork.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class FeeController : ControllerBase
+    public class RewardController : ControllerBase
     {
 
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public FeeController(ApplicationDbContext context, obrnDbContext obrnContext,
+        public RewardController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
@@ -35,29 +35,29 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/fee/{feeId}")]
+        [Route("/reward/{rewardId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] string feeId)
+        public virtual IActionResult GetFee([FromRoute][Required] int rewardId)
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fee = feeRepo.GetFeeById(feeId);
-            if (fee != null)
-            {
-                return Ok(fee);
+            RewardRepo rewardRepo = new RewardRepo(_context, _obrnContext);
 
+            var reward = rewardRepo.GetRewardById(rewardId);
+            if (reward == null)
+            {
+                return NotFound(); // Return a 404 Not Found response if testimonialId does not exist
             }
-            return NotFound("Fee not found");
+            return Ok(reward);
         }
 
         [HttpGet]
-        [Route("/fee")]
+        [Route("/service")]
         //[ValidateModelState]
-        [SwaggerOperation("FeeGet")]
-        public virtual IActionResult FeeGet()
+        [SwaggerOperation("RewardGet")]
+        public virtual IActionResult RewardGet()
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var fees = feeRepo.GetAllFees();
-            return Ok(fees);
+            RewardRepo rewardRepo = new RewardRepo(_context, _obrnContext);
+            var rewards = rewardRepo.GetAllRewards();
+            return Ok(rewards);
         }
     }
 }
