@@ -40,5 +40,12 @@ namespace OurBeautyReferralNetwork.Controllers
             var result = await _customerRepo.AddCustomer(model);
             return result;
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(User model)
+        {
+            var result = await _customerRepo.Login(model);
+            return result;
+        }
     }
 }
