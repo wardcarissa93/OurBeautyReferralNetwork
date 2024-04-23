@@ -73,6 +73,13 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
+                // Check if a customer with the same PkCustomerId already exists
+                var existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
+                if (existingCustomer != null)
+                {
+                    return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
+                }
+
                 Customer newCustomer = new Customer
                 {
                     PkCustomerId = customer.PkCustomerId,
