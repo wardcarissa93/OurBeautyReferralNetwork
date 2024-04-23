@@ -50,7 +50,7 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/service")]
+        [Route("/reward")]
         //[ValidateModelState]
         [SwaggerOperation("RewardGet")]
         public virtual IActionResult RewardGet()
