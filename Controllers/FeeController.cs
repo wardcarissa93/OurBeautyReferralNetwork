@@ -59,5 +59,57 @@ namespace OurBeautyReferralNetwork.Controllers
             var fees = feeRepo.GetAllFees();
             return Ok(fees);
         }
+
+        [HttpPost]
+        [Route("/fee/create")]
+        public IActionResult Create(FeeAndCommission fee)
+        {
+            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
+            bool isSuccess = feeRepo.CreateFee(fee);
+
+            if (isSuccess)
+            {
+                return CreatedAtAction(nameof(GetFee), new { feeId = fee.PkFeeId }, fee);
+            }
+            return BadRequest();
+            
+        }
+
+        [HttpPut("{feeId}")]
+        public IActionResult Update(string feeId, FeeAndCommission fee)
+        {
+            if (feeId != fee.PkFeeId)
+                return BadRequest();
+
+            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
+            var existingFee = feeRepo.GetFeeById(feeId);
+            if (existingFee is null)
+            {
+                return NotFound("Fee not found with the provided ID.");
+
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{feeId}")]
+        [SwaggerOperation("Delete")]
+        public IActionResult Delete(string feeId)
+        {
+            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
+            string message = feeRepo.Delete(feeId);
+            if (message == "Fee does not exist")
+            {
+                return NotFound();
+            }
+            else if (message == "Deleted successfully")
+            {
+                return Ok(); // server successfully processed the request and there is no content to send in the response payload.
+            }
+            else
+            {
+                // Handle other potential error cases, such as database errors
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
