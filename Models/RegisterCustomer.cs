@@ -21,7 +21,7 @@ public partial class RegisterCustomer
 
     public bool Confirm18 { get; set; }
 
-    public string? Password { get; set; }
+    public string Password { get; set; } = null!;
 
-    public string? ConfirmPassword { get; set; }
+    public string ConfirmPassword { get; set; } = null!;
 }
