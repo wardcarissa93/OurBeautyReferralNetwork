@@ -37,7 +37,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [HttpGet]
         [Route("/testimonial/{testimonialId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] int testimonialId)
+        public virtual IActionResult GetTestimonial([FromRoute][Required] int testimonialId)
         {
             TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
 
@@ -58,6 +58,42 @@ namespace OurBeautyReferralNetwork.Controllers
             TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
             var testimonials = testimonialRepo.GetAllTestimonials();
             return Ok(testimonials);
+        }
+
+        [HttpPost]
+        [Route("/testimonial/create")]
+        public IActionResult Create(Testimonial testimonial)
+        {
+            TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
+            bool isSuccess = testimonialRepo.CreateTestimonial(testimonial);
+
+            if (isSuccess)
+            {
+                return CreatedAtAction(nameof(GetTestimonial), new { testimonialId = testimonial.PkTestimonialId }, testimonial);
+            }
+            return BadRequest();
+
+        }
+
+        [HttpDelete("{TestimonialId}")]
+        [SwaggerOperation("Delete")]
+        public IActionResult Delete(int testimonialId)
+        {
+            TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
+            string message = testimonialRepo.Delete(testimonialId);
+            if (message == "Testimonial does not exist")
+            {
+                return NotFound();
+            }
+            else if (message == "Deleted successfully")
+            {
+                return Ok(); // server successfully processed the request and there is no content to send in the response payload.
+            }
+            else
+            {
+                // Handle other potential error cases, such as database errors
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }
