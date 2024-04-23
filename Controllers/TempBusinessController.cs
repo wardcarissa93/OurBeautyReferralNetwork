@@ -22,5 +22,12 @@ namespace OurBeautyReferralNetwork.Controllers
             var businesses = _businessRepo.GetAllBusinesses();
             return Ok(businesses);
         }
+
+        [HttpPost("addbusiness")]
+        public async Task<IActionResult> AddBusiness(RegisterBusiness model)
+        {
+            var result = await _businessRepo.AddBusiness(model);
+            return result;
+        }
     }
 }
