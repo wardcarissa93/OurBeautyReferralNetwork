@@ -70,5 +70,19 @@ namespace OurBeautyReferralNetwork.Repositories
                 return new BadRequestObjectResult($"Error adding customer: {ex.Message}");
             }
         }
+        public async Task<IActionResult> Login(User model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                // Login successful, generate JWT token
+                var token = _jWTUtilities.GenerateJwtToken(user.Email);
+
+                return new OkObjectResult(new { Message = "Login successful", Token = token });
+            }
+
+            return new BadRequestObjectResult(new { Message = "Invalid username or password" });
+        }
+
     }
 }
