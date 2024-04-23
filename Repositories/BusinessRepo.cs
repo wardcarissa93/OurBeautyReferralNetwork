@@ -45,9 +45,9 @@ namespace OurBeautyReferralNetwork.Repositories
                     InsuranceCompany = business.InsuranceCompany,
                     InsuranceExpiryDate = business.InsuranceExpiryDate,
                     RegistrationDate = DateOnly.FromDateTime(DateTime.Today),
-                    CommissionPaid = business.CommissionPaid,
+                    CommissionPaid = false,
                     VerificationDocument = business.VerificationDocument,
-                    IsVerified = business.IsVerified,
+                    IsVerified = false,
                 };
 
                 _obrnDbContext.Businesses.Add(newBusiness);

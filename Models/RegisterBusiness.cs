@@ -13,10 +13,7 @@ public partial class RegisterBusiness
     public string Phone { get; set; } = null!;
     public string InsuranceCompany { get; set; } = null!;
     public DateOnly InsuranceExpiryDate { get; set; }
-    public DateOnly RegistrationDate { get; set; }
-    public bool CommissionPaid { get; set; }
     public string VerificationDocument {  get; set; } = null!;
-    public bool IsVerified { get; set; }
     public string Password { get; set; } = null!;
     public string ConfirmPassword {  get; set; } = null!;
 }
