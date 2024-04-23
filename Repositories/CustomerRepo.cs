@@ -81,7 +81,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 return new OkObjectResult(new { Message = "Login successful", Token = token });
             }
 
-            return new BadRequestObjectResult(new { Message = "Invalid username or password" });
+            return new BadRequestObjectResult(new { Message = "Invalid email or password" });
         }
 
     }

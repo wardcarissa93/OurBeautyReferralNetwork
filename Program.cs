@@ -26,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 Console.WriteLine($"Connection string: {connectionString}");
 
 builder.Services.AddScoped<CustomerRepo>();
+builder.Services.AddScoped<BusinessRepo>();
 builder.Services.AddScoped<JWTUtilities>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block
