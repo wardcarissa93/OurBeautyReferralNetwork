@@ -37,7 +37,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [HttpGet]
         [Route("/service/{serviceId}")]
 
-        public virtual IActionResult GetFee([FromRoute][Required] int serviceId)
+        public virtual IActionResult GetServiceById([FromRoute][Required] int serviceId)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
 
@@ -50,14 +50,40 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/service")]
+        [Route("/services")]
         //[ValidateModelState]
-        [SwaggerOperation("ServiceGet")]
-        public virtual IActionResult ServiceGet()
+        [SwaggerOperation("ServiceGetAll")]
+        public virtual IActionResult ServiceGetAll()
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
             var services = serviceRepo.GetAllServices();
             return Ok(services);
+        }
+
+        [HttpGet]
+        //[Route("/service")]
+        //[ValidateModelState]
+        [SwaggerOperation("GetServicesForBusiness")]
+        public virtual IActionResult GetServicesForBusiness(string businessId)
+        {
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            var services = serviceRepo.GetAllServicesOfBusiness(businessId);
+            return Ok(services);
+        }
+
+        [HttpPost]
+        [Route("/service/create")]
+        public IActionResult CreateForBusiness(Service service, string businessID)
+        {
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            bool isSuccess = serviceRepo.CreateServiceForBusiness(service, businessID);
+
+            if (isSuccess)
+            {
+                return CreatedAtAction(nameof(GetServicesForBusiness), new { serviceId = service.PkServiceId }, service);
+            }
+            return BadRequest();
+
         }
     }
 }

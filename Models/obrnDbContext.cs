@@ -19,7 +19,21 @@ public partial class obrnDbContext : DbContext
 
     public virtual DbSet<AppointmentService> AppointmentServices { get; set; }
 
+    public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
+
+    public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
+
+    public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+
+    public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
+
+    public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
+
+    public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
+
     public virtual DbSet<Business> Businesses { get; set; }
+
+    public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
 
@@ -86,6 +100,68 @@ public partial class obrnDbContext : DbContext
                 .HasConstraintName("fk_appointment_id");
         });
 
+        modelBuilder.Entity<AspNetRole>(entity =>
+        {
+            entity.HasIndex(e => e.NormalizedName, "RoleNameIndex").IsUnique();
+
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.NormalizedName).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<AspNetRoleClaim>(entity =>
+        {
+            entity.HasIndex(e => e.RoleId, "IX_AspNetRoleClaims_RoleId");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.AspNetRoleClaims).HasForeignKey(d => d.RoleId);
+        });
+
+        modelBuilder.Entity<AspNetUser>(entity =>
+        {
+            entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
+
+            entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex").IsUnique();
+
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+            entity.Property(e => e.UserName).HasMaxLength(256);
+
+            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AspNetUserRole",
+                    r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
+                    l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
+                    j =>
+                    {
+                        j.HasKey("UserId", "RoleId");
+                        j.ToTable("AspNetUserRoles");
+                        j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
+                    });
+        });
+
+        modelBuilder.Entity<AspNetUserClaim>(entity =>
+        {
+            entity.HasIndex(e => e.UserId, "IX_AspNetUserClaims_UserId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserClaims).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<AspNetUserLogin>(entity =>
+        {
+            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+
+            entity.HasIndex(e => e.UserId, "IX_AspNetUserLogins_UserId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserLogins).HasForeignKey(d => d.UserId);
+        });
+
+        modelBuilder.Entity<AspNetUserToken>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
+        });
+
         modelBuilder.Entity<Business>(entity =>
         {
             entity.HasKey(e => e.PkBusinessId).HasName("Business_pkey");
@@ -109,6 +185,19 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.PostalCode).HasMaxLength(255);
             entity.Property(e => e.Province).HasMaxLength(255);
             entity.Property(e => e.VerificationDocument).HasMaxLength(255);
+            entity.Property(e => e.Vip)
+                .HasDefaultValue(false)
+                .HasColumnName("VIP");
+        });
+
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasKey(e => e.PkCategoryId).HasName("Category_pkey");
+
+            entity.ToTable("Category");
+
+            entity.Property(e => e.PkCategoryId).HasColumnName("pkCategoryID");
+            entity.Property(e => e.CategoryName).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Customer>(entity =>
@@ -262,6 +351,7 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.FkBusinessId)
                 .HasMaxLength(30)
                 .HasColumnName("fkBusinessID");
+            entity.Property(e => e.FkCategoryId).HasColumnName("fkCategoryID");
             entity.Property(e => e.FkDiscountId)
                 .HasMaxLength(5)
                 .HasColumnName("fkDiscountID");
@@ -272,6 +362,11 @@ public partial class obrnDbContext : DbContext
                 .HasForeignKey(d => d.FkBusinessId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Service_fkBusinessID_fkey");
+
+            entity.HasOne(d => d.FkCategory).WithMany(p => p.Services)
+                .HasForeignKey(d => d.FkCategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Service_fkCategoryID_fkey");
 
             entity.HasOne(d => d.FkDiscount).WithMany(p => p.Services)
                 .HasForeignKey(d => d.FkDiscountId)
@@ -286,6 +381,7 @@ public partial class obrnDbContext : DbContext
             entity.ToTable("Testimonial");
 
             entity.Property(e => e.PkTestimonialId).HasColumnName("pkTestimonialId");
+            entity.Property(e => e.Approved).HasDefaultValue(false);
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.FkBusinessId)
                 .HasMaxLength(30)

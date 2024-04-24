@@ -15,5 +15,7 @@ public partial class Testimonial
 
     public DateOnly TestimonialDate { get; set; }
 
+    public bool Approved { get; set; }
+
     public virtual Business FkBusiness { get; set; } = null!;
 }

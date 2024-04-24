@@ -39,6 +39,8 @@ public partial class Business
 
     public bool IsVerified { get; set; }
 
+    public bool Vip { get; set; }
+
     public virtual ICollection<Referral> ReferralFkReferredBusinesses { get; set; } = new List<Referral>();
 
     public virtual ICollection<Referral> ReferralFkReferrerBusinesses { get; set; } = new List<Referral>();

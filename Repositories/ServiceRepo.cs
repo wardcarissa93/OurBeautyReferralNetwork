@@ -1,5 +1,6 @@
 ﻿using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OurBeautyReferralNetwork.Repositories
 {
@@ -29,5 +30,36 @@ namespace OurBeautyReferralNetwork.Repositories
             return service;
         }
 
+        public List<Service> GetAllServicesOfBusiness(string businessId)
+        {
+            return _obrnContext.Services
+                .Where(s => s.FkBusinessId == businessId)
+                .ToList();
+        }
+
+        public bool CreateServiceForBusiness(Service service, string businessId)
+        {
+            bool isSuccess = true;
+            try
+            {
+                _obrnContext.Services.Add(new Service
+                {
+                    PkServiceId = service.PkServiceId,
+                    Image = service.Image,
+                    FkBusinessId = businessId,
+                    ServiceName = service.ServiceName,
+                    Description = service.Description,
+                    FkDiscountId = service.FkDiscountId,
+                    Price = service.Price
+                });
+                _obrnContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                isSuccess = false;
+            }
+
+            return isSuccess;
+        }
     }
 }
