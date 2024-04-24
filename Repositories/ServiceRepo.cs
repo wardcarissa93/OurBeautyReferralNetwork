@@ -30,6 +30,29 @@ namespace OurBeautyReferralNetwork.Repositories
             return service;
         }
 
+        public decimal? GetServiceDiscount(int serviceId)
+        {
+            var service = GetServiceById(serviceId);
+            if (service == null)
+            {
+                return null;
+            }
+
+            var query = from s in _obrnContext.Services
+                        join d in _obrnContext.Discounts
+                        on s.FkDiscountId equals d.PkDiscountId
+                        where s.PkServiceId == serviceId
+                        select new
+                        {
+                            DiscountPrice = s.BasePrice - (s.BasePrice * d.Amount)
+                        };
+
+            var result = query.FirstOrDefault();
+
+            return result?.DiscountPrice;
+        }
+
+
         public List<Service> GetAllServicesOfBusiness(string businessId)
         {
             return _obrnContext.Services

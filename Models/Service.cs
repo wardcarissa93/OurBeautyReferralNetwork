@@ -13,6 +13,8 @@ public partial class Service
 
     public string ServiceName { get; set; } = null!;
 
+    public string Name { get; set; } = null!;
+
     public string Description { get; set; } = null!;
 
     public string FkDiscountId { get; set; } = null!;

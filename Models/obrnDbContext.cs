@@ -249,13 +249,14 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.PkFeeId)
                 .HasMaxLength(4)
                 .HasColumnName("pkFeeID");
-            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(1200);
             entity.Property(e => e.FeeType)
                 .HasMaxLength(12)
                 .IsFixedLength();
             entity.Property(e => e.Frequency)
                 .HasMaxLength(8)
                 .IsFixedLength();
+            entity.Property(e => e.Title).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Referral>(entity =>
@@ -356,6 +357,7 @@ public partial class obrnDbContext : DbContext
                 .HasMaxLength(5)
                 .HasColumnName("fkDiscountID");
             entity.Property(e => e.Image).HasMaxLength(255);
+            entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.ServiceName).HasMaxLength(255);
 
             entity.HasOne(d => d.FkBusiness).WithMany(p => p.Services)
