@@ -17,9 +17,13 @@ public partial class Service
 
     public string FkDiscountId { get; set; } = null!;
 
-    public decimal? Price { get; set; }
+    public int FkCategoryId { get; set; }
+
+    public decimal? BasePrice { get; set; }
 
     public virtual Business FkBusiness { get; set; } = null!;
+
+    public virtual Category FkCategory { get; set; } = null!;
 
     public virtual Discount FkDiscount { get; set; } = null!;
 }

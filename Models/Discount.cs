@@ -11,5 +11,9 @@ public partial class Discount
 
     public decimal? Percentage { get; set; }
 
+    public DateOnly? StartDate { get; set; }
+
+    public DateOnly? EndDate { get; set; }
+
     public virtual ICollection<Service> Services { get; set; } = new List<Service>();
 }
