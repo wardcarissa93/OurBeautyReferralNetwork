@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Utilities;
 
@@ -24,6 +25,26 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             IEnumerable<Business> businesses = _obrnDbContext.Businesses.ToList();
             return businesses;
+        }
+
+        public async Task<IActionResult> GetBusinessById(string businessId)
+        {
+            try
+            {
+                var business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(c => c.PkBusinessId == businessId);
+                if (business != null)
+                {
+                    return new OkObjectResult(business);
+                }
+                else
+                {
+                    return new NotFoundObjectResult("Business not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error getting business: {ex.Message}");
+            }
         }
 
         public async Task<IActionResult> AddBusiness(RegisterBusiness business)
