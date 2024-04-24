@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OurBeautyReferralNetwork.CustomerModels;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Utilities;
@@ -132,12 +133,12 @@ namespace OurBeautyReferralNetwork.Repositories
             return new BadRequestObjectResult(new { Message = "Invalid email or password" });
         }
 
-        public async Task<IActionResult> EditCustomer(Customer customer)
+        public async Task<IActionResult> EditCustomer(EditCustomer customer)
         {
             try
             {
                 // Check if the customer exists in the database
-                var existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
+                var existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
                 if (existingCustomer == null)
                 {
                     return new NotFoundObjectResult("Customer not found");
