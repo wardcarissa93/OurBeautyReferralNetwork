@@ -50,7 +50,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     ServiceName = service.ServiceName,
                     Description = service.Description,
                     FkDiscountId = service.FkDiscountId,
-                    Price = service.Price
+                    BasePrice = service.BasePrice
                 });
                 _obrnContext.SaveChanges();
             }
