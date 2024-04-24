@@ -29,5 +29,46 @@ namespace OurBeautyReferralNetwork.Repositories
             return category;
         }
 
+        public bool CreateCategory(Category category)
+        {
+            bool isSuccess = true;
+            try
+            {
+                _obrnContext.Categories.Add(new Category
+                {
+                    CategoryName = category.CategoryName,
+                });
+                _obrnContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                isSuccess = false;
+            }
+
+            return isSuccess;
+        }
+
+        public string Delete(int categoryId)
+        {
+            try
+            {
+                var category = GetCategoryById(categoryId);
+                if (category == null)
+                {
+                    return "Fee does not exist";
+                }
+
+                _obrnContext.Categories.Remove(category);
+                _obrnContext.SaveChanges();
+                return "Deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // You can also return a custom error message if needed
+                Console.WriteLine($"Error occurred during delete: {ex.Message}");
+                return "An error occurred during delete";
+            }
+        }
     }
 }

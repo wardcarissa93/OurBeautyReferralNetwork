@@ -58,5 +58,42 @@ namespace OurBeautyReferralNetwork.Controllers
             var categories = categoryRepo.GetAllCategories();
             return Ok(categories);
         }
+
+        [HttpPost]
+        [Route("/category/create")]
+        public IActionResult Create(Category category)
+        {
+            CategoryRepo categoryRepo = new CategoryRepo(_context, _obrnContext);
+            bool isSuccess = categoryRepo.CreateCategory(category);
+
+            if (isSuccess)
+            {
+                return CreatedAtAction(nameof(CategoryGet), new { categoryId = category.PkCategoryId }, category);
+            }
+            return BadRequest();
+
+        }
+
+
+        [HttpDelete("{categoryId}")]
+        [SwaggerOperation("Delete")]
+        public IActionResult Delete(int categoryId)
+        {
+            CategoryRepo categoryRepo = new CategoryRepo(_context, _obrnContext);
+            string message = categoryRepo.Delete(categoryId);
+            if (message == "Fee does not exist")
+            {
+                return NotFound();
+            }
+            else if (message == "Deleted successfully")
+            {
+                return Ok(); // server successfully processed the request and there is no content to send in the response payload.
+            }
+            else
+            {
+                // Handle other potential error cases, such as database errors
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
