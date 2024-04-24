@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OurBeautyReferralNetwork.Models;
+namespace OurBeautyReferralNetwork.CustomerModels;
 
 public partial class RegisterCustomer
 {

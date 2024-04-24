@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using OurBeautyReferralNetwork.CustomerModels;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
@@ -59,6 +60,13 @@ namespace OurBeautyReferralNetwork.Controllers
         public async Task<IActionResult> Login(User model)
         {
             var result = await _customerRepo.Login(model);
+            return result;
+        }
+
+        [HttpPost("editcustomer")]
+        public async Task<IActionResult> EditCustomer(EditCustomer customer)
+        {
+            var result = await _customerRepo.EditCustomer(customer);
             return result;
         }
     }
