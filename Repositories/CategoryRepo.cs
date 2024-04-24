@@ -58,6 +58,11 @@ namespace OurBeautyReferralNetwork.Repositories
                     return "Fee does not exist";
                 }
 
+                if (_obrnContext.Services.Any(s => s.FkCategoryId == categoryId))
+                {
+                    return "this category is currently in use";
+                }
+
                 _obrnContext.Categories.Remove(category);
                 _obrnContext.SaveChanges();
                 return "Deleted successfully";

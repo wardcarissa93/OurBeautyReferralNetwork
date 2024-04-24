@@ -89,6 +89,10 @@ namespace OurBeautyReferralNetwork.Controllers
             {
                 return Ok(); // server successfully processed the request and there is no content to send in the response payload.
             }
+            else if (message == "this category is currently in use")
+            {
+                return Conflict("Category is currently in use and cannot be deleted");
+            }
             else
             {
                 // Handle other potential error cases, such as database errors
