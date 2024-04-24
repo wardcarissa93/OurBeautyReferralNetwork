@@ -23,6 +23,13 @@ namespace OurBeautyReferralNetwork.Controllers
             return Ok(businesses);
         }
 
+        [HttpGet("getbusiness/{id}")]
+        public async Task<IActionResult> GetBusinessById(string id)
+        {
+            var result = await _businessRepo.GetBusinessById(id);
+            return result;
+        }
+
         [HttpPost("addbusiness")]
         public async Task<IActionResult> AddBusiness(RegisterBusiness model)
         {
