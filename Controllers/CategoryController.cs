@@ -17,14 +17,14 @@ namespace OurBeautyReferralNetwork.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class CatetoryController : ControllerBase
+    public class CategoryController : ControllerBase
     {
 
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-        public CatetoryController(ApplicationDbContext context, obrnDbContext obrnContext,
+        public CategoryController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
                               IConfiguration configuration)
         {
