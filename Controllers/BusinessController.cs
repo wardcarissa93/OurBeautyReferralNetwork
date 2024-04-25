@@ -31,6 +31,13 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
+        [HttpGet("getbusinessbyemail")]
+        public async Task<IActionResult> GetBusinessByEmail(string email)
+        {
+            var result = await _businessRepo.GetBusinessByEmail(email);
+            return result;
+        }
+
         [HttpPost("addbusiness")]
         public async Task<IActionResult> AddBusiness(RegisterBusiness model)
         {
