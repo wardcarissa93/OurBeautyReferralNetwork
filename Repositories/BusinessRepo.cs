@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OurBeautyReferralNetwork.BusinessModels;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Utilities;
 
@@ -55,7 +56,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 {
                     PkBusinessId = business.PkBusinessId,
                     BusinessName = business.BusinessName,
-                    Logo = "logo goes here",
+                    Logo = business.Logo,
                     ContactName = business.ContactName,
                     Address = business.Address,
                     City = business.City,
