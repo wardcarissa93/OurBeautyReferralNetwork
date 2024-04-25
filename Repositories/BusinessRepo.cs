@@ -48,6 +48,26 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
+        public async Task<IActionResult> GetBusinessByEmail(string email)
+        {
+            try
+            {
+                var business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(b => b.Email == email);
+                if (business != null)
+                {
+                    return new OkObjectResult(business);
+                }
+                else
+                {
+                    return new NotFoundObjectResult("Business not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error getting business: {ex.Message}");
+            }
+        }
+
         public async Task<IActionResult> AddBusiness(RegisterBusiness business)
         {
             try
