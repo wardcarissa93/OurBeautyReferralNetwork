@@ -25,6 +25,8 @@ namespace OurBeautyReferralNetwork.Repositories
             });
         }
 
+
+
         public bool CreateRole(string roleName)
         {
             var normalizedRoleName = roleName.ToUpper();
