@@ -22,5 +22,12 @@ namespace OurBeautyReferralNetwork.Controllers
             var roles = _roleRepo.GetAllRoles();
             return Ok(roles);
         }
+
+        [HttpPost("addrole")]
+        public async Task<IActionResult> AddRole(string roleName)
+        {
+            var result = await _roleRepo.AddRole(roleName);
+            return result;
+        }
     }
 }
