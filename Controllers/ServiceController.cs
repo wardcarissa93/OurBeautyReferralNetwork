@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.EntityExtensions;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
@@ -46,7 +47,11 @@ namespace OurBeautyReferralNetwork.Controllers
             {
                 return NotFound(); // Return a 404 Not Found response if testimonialId does not exist
             }
-            return Ok(service);
+            decimal? discountPercentage = serviceRepo.GetServiceDiscount(serviceId);
+            decimal actualDiscount = discountPercentage ?? 0;
+
+            var extendedService = service.ExtendService(actualDiscount);
+            return Ok(extendedService);
         }
 
         [HttpGet]

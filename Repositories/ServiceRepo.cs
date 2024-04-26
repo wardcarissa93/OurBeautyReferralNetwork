@@ -1,4 +1,5 @@
 ﻿using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.EntityExtensions;
 using OurBeautyReferralNetwork.Models;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -15,9 +16,24 @@ namespace OurBeautyReferralNetwork.Repositories
             _obrnContext = obrnContext;
         }
 
-        public IEnumerable<Service> GetAllServices()
+        public IEnumerable<Service> GetAllServicesBase()
         {
             return _obrnContext.Services.ToList();
+        }
+
+        public IEnumerable<Service> GetAllServices()
+        {
+            var services = GetAllServicesBase();
+
+            var extendedServices = services.Select(service =>
+            {
+                decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
+                decimal actualDiscount = discountPercentage ?? 0;
+
+                return service.ExtendService(actualDiscount);
+            });
+
+            return null;
         }
 
         public Service GetServiceById(int serviceId)
@@ -44,7 +60,7 @@ namespace OurBeautyReferralNetwork.Repositories
                         where s.PkServiceId == serviceId
                         select new
                         {
-                            DiscountPrice = s.BasePrice - (s.BasePrice * d.Amount)
+                            DiscountPrice = s.BasePrice - (s.BasePrice * d.Percentage)
                         };
 
             var result = query.FirstOrDefault();
@@ -53,11 +69,21 @@ namespace OurBeautyReferralNetwork.Repositories
         }
 
 
-        public List<Service> GetAllServicesOfBusiness(string businessId)
+        public IEnumerable<Service> GetAllServicesOfBusiness(string businessId)
         {
-            return _obrnContext.Services
+            var services =  _obrnContext.Services
                 .Where(s => s.FkBusinessId == businessId)
                 .ToList();
+
+            var extendedServices = services.Select(service =>
+            {
+                decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
+                decimal actualDiscount = discountPercentage ?? 0;
+
+                return service.ExtendService(actualDiscount);
+            });
+
+            return null;
         }
 
         public bool CreateServiceForBusiness(Service service, string businessId)
