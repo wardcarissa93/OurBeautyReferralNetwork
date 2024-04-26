@@ -25,27 +25,16 @@ namespace OurBeautyReferralNetwork.Repositories
             });
         }
 
-
-
-        public bool CreateRole(string roleName)
+        public AspNetRole GetRole(string roleName)
         {
-            var normalizedRoleName = roleName.ToUpper();
-
-            if (_context.Roles.Any(r => r.NormalizedName == normalizedRoleName))
+            var role = _context.Roles.FirstOrDefault(r => r.Name == roleName);
+            return role != null ? new AspNetRole
             {
-                return false; // Role already exists
-            }
-
-            _context.Roles.Add(new IdentityRole
-            {
-                Id = normalizedRoleName,
-                Name = roleName,
-                NormalizedName = normalizedRoleName
-            });
-
-            _context.SaveChanges();
-
-            return true;
+                Id = role.Id,
+                Name = role.Name,
+                NormalizedName = role.NormalizedName,
+                ConcurrencyStamp = role.ConcurrencyStamp
+            } : null;
         }
 
         public async Task<IActionResult> AddRole(string roleName)
