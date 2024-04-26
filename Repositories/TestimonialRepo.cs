@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 
 namespace OurBeautyReferralNetwork.Repositories
@@ -30,28 +31,29 @@ namespace OurBeautyReferralNetwork.Repositories
             return testimonial;
         }
 
-        public bool CreateTestimonial(Testimonial testimonial)
+        public Testimonial CreateTestimonial(TestimonialDTO testimonialDTO)
         {
-            bool isSuccess = true;
+            var testimonial = new Testimonial
+            {
+                FkBusinessId = testimonialDTO.FkBusinessId,
+                Description = testimonialDTO.Description,
+                Rating = testimonialDTO.Rating,
+                TestimonialDate = DateOnly.FromDateTime(DateTime.Now),
+                Approved = testimonialDTO.Approved,
+            };
             try
             {
-                _obrnContext.Testimonials.Add(new Testimonial
-                {
-                    PkTestimonialId = testimonial.PkTestimonialId,
-                    FkBusinessId = testimonial.FkBusinessId,
-                    Description = testimonial.Description,
-                    Rating = testimonial.Rating,
-                    TestimonialDate = DateOnly.FromDateTime(DateTime.Now)
-            }); 
+                _obrnContext.Testimonials.Add(testimonial);
                 _obrnContext.SaveChanges();
+                return testimonial; // Return the newly added testimonial
             }
             catch (Exception ex)
             {
-                isSuccess = false;
+                // Optionally log the exception here
+                return null; // Return null or handle the exception as needed
             }
-
-            return isSuccess;
         }
+
 
         public string Delete(int TestimonialId)
         {
