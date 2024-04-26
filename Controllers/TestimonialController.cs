@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
@@ -62,18 +63,17 @@ namespace OurBeautyReferralNetwork.Controllers
 
         [HttpPost]
         [Route("/testimonial/create")]
-        public IActionResult Create(Testimonial testimonial)
+        public IActionResult Create(TestimonialDTO testimonialDTO)
         {
             TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnContext);
-            bool isSuccess = testimonialRepo.CreateTestimonial(testimonial);
-
-            if (isSuccess)
+            Testimonial createdTestimonial = testimonialRepo.CreateTestimonial(testimonialDTO);
+            if (createdTestimonial != null)
             {
-                return CreatedAtAction(nameof(GetTestimonial), new { testimonialId = testimonial.PkTestimonialId }, testimonial);
+                return CreatedAtAction(nameof(GetTestimonial), new { testimonialId = createdTestimonial.PkTestimonialId }, createdTestimonial);
             }
             return BadRequest();
-
         }
+
 
         [HttpDelete("{TestimonialId}")]
         [SwaggerOperation("Delete")]
