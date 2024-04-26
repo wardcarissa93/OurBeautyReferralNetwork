@@ -101,17 +101,22 @@ namespace OurBeautyReferralNetwork.Repositories
                     Email = business.Email
                 };
 
-                var result = await _userManager.CreateAsync(user, business.Password);
+                var addUserResult = await _userManager.CreateAsync(user, business.Password);
 
-                if (result.Succeeded)
+                if (addUserResult.Succeeded)
                 {
-                    // Generate JWT for the added business
-                    var token = _jwtUtilities.GenerateJwtToken(business.Email);
+                    var addUserRoleResult = await _userManager.AddToRoleAsync(user, "business");
+                    if (addUserRoleResult.Succeeded)
+                    {
+                        // Generate JWT for the added business
+                        var token = _jwtUtilities.GenerateJwtToken(business.Email);
 
-                    return new OkObjectResult(new { Message = "Business added successfully", Token = token });
+                        return new OkObjectResult(new { Message = "Business added successfully", Token = token });
+                    }
+                    return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
                 }
 
-                return new BadRequestObjectResult(new { Errors = result.Errors });
+                return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
             }
             catch (Exception ex)
             {
