@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.Models;
 
 namespace OurBeautyReferralNetwork.Repositories
 {
@@ -38,6 +39,17 @@ namespace OurBeautyReferralNetwork.Repositories
             }
 
             return new BadRequestObjectResult("User not found.");
+        }
+
+        public async Task<IList<string>> GetUserRolesAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                return roles;
+            }
+            return null;
         }
     }
 }

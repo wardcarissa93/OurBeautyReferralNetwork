@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
 namespace OurBeautyReferralNetwork.Controllers
@@ -22,6 +23,13 @@ namespace OurBeautyReferralNetwork.Controllers
         {
             var result = await _userRoleRepo.AddUserRoleAsync(email, roleName);
             return result;
+        }
+
+        [HttpGet("getuserroles")]
+        public async Task<IList<string>> GetUserRoles(string email)
+        {
+            var roles = await _userRoleRepo.GetUserRolesAsync(email);
+            return roles;
         }
     }
 }
