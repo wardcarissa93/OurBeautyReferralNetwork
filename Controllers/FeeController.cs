@@ -82,13 +82,13 @@ namespace OurBeautyReferralNetwork.Controllers
                 return BadRequest();
 
             FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            var existingFee = feeRepo.GetFeeById(feeId);
-            if (existingFee is null)
+            bool isSuccess = feeRepo.Update(fee);
+            if (!isSuccess)
             {
                 return NotFound("Fee not found with the provided ID.");
 
             }
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{feeId}")]

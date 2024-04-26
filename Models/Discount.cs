@@ -7,9 +7,7 @@ public partial class Discount
 {
     public string PkDiscountId { get; set; } = null!;
 
-    public decimal? Amount { get; set; }
-
-    public decimal? Percentage { get; set; }
+    public decimal Percentage { get; set; }
 
     public DateOnly? StartDate { get; set; }
 

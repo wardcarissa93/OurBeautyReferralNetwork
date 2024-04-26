@@ -37,7 +37,6 @@ namespace OurBeautyReferralNetwork.Repositories
                 _obrnContext.Discounts.Add(new Discount
                 {
                     PkDiscountId = discount.PkDiscountId,
-                    Amount = discount.Amount,
                     Percentage = discount.Percentage,
                     StartDate = discount.StartDate,
                     EndDate = discount.EndDate,
