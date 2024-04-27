@@ -22,7 +22,7 @@ namespace OurBeautyReferralNetwork.Repositories
             return _obrnContext.Services.ToList();
         }
 
-        public IEnumerable<Service> GetAllServices()
+        public IEnumerable<ServiceDTO> GetAllServices()
         {
             var services = GetAllServicesBase();
 
@@ -34,7 +34,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 return service.ExtendService(actualDiscount);
             });
 
-            return null;
+            return extendedServices;
         }
 
         public Service GetServiceById(int serviceId)
