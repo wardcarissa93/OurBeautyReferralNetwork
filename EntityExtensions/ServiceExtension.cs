@@ -5,9 +5,9 @@ namespace OurBeautyReferralNetwork.EntityExtensions
 {
     public static class ServiceExtension
     {
-        public static Services ExtendService(this Models.Service service, decimal discountPercentage)
+        public static ServiceDTO ExtendService(this Models.Service service, decimal discountPercentage)
         {
-            return new Services
+            return new ServiceDTO
             {
                 PkServiceId = service.PkServiceId,
                 ServiceName = service.ServiceName,

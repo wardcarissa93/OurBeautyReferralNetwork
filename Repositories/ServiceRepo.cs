@@ -1,4 +1,5 @@
 ﻿using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.EntityExtensions;
 using OurBeautyReferralNetwork.Models;
 using static System.Net.Mime.MediaTypeNames;
@@ -86,29 +87,33 @@ namespace OurBeautyReferralNetwork.Repositories
             return null;
         }
 
-        public bool CreateServiceForBusiness(Service service, string businessId)
+        public Service CreateServiceForBusiness(ServiceDTO serviceDTO, string businessId)
         {
-            bool isSuccess = true;
+            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+            Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
+            var service = new Service
+            {
+                PkServiceId = serviceDTO.PkServiceId,
+                Image = serviceDTO.Image,
+                FkBusinessId = businessId,
+                ServiceName = serviceDTO.ServiceName,
+                Description = serviceDTO.Description,
+                FkDiscountId = serviceDTO.FkDiscountId,
+                BasePrice = serviceDTO.BasePrice,
+                FkDiscount = discount,
+                FkCategoryId = serviceDTO.FkCategoryId,
+            };
             try
             {
-                _obrnContext.Services.Add(new Service
-                {
-                    PkServiceId = service.PkServiceId,
-                    Image = service.Image,
-                    FkBusinessId = businessId,
-                    ServiceName = service.ServiceName,
-                    Description = service.Description,
-                    FkDiscountId = service.FkDiscountId,
-                    BasePrice = service.BasePrice
-                });
+                _obrnContext.Services.Add(service);
                 _obrnContext.SaveChanges();
+                return service;
             }
             catch (Exception ex)
             {
-                isSuccess = false;
+                Console.WriteLine(ex.ToString());
+                return null;
             }
-
-            return isSuccess;
         }
     }
 }

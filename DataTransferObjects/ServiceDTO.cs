@@ -2,7 +2,7 @@
 
 namespace OurBeautyReferralNetwork.DataTransferObjects
 {
-    public class Services
+    public class ServiceDTO
     {
         public int PkServiceId { get; set; }
 
@@ -11,8 +11,6 @@ namespace OurBeautyReferralNetwork.DataTransferObjects
         public string FkBusinessId { get; set; } = null!;
 
         public string ServiceName { get; set; } = null!;
-
-        public string Name { get; set; } = null!;
 
         public string Description { get; set; } = null!;
 
@@ -28,9 +26,9 @@ namespace OurBeautyReferralNetwork.DataTransferObjects
         // Property to access Discount's Percentage
         public decimal? DiscountPrice => FkDiscount?.Percentage; // This calculates the discount percentage from the related Discount entity
 
-        // Other properties and relationships
-        public virtual Business FkBusiness { get; set; } = null!;
+        //// Other properties and relationships
+        //public virtual Business FkBusiness { get; set; } = null!;
 
-        public virtual Category FkCategory { get; set; } = null!;
+        //public virtual Category FkCategory { get; set; } = null!;
     }
 }

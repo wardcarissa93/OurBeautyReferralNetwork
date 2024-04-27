@@ -357,7 +357,6 @@ public partial class obrnDbContext : DbContext
                 .HasMaxLength(5)
                 .HasColumnName("fkDiscountID");
             entity.Property(e => e.Image).HasMaxLength(255);
-            entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.ServiceName).HasMaxLength(255);
 
             entity.HasOne(d => d.FkBusiness).WithMany(p => p.Services)
