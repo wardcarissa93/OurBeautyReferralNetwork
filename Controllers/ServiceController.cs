@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.EntityExtensions;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
@@ -78,14 +79,14 @@ namespace OurBeautyReferralNetwork.Controllers
 
         [HttpPost]
         [Route("/service/create")]
-        public IActionResult CreateForBusiness(Service service, string businessID)
+        public IActionResult CreateForBusiness(ServiceDTO serviceDTO, string businessID)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            bool isSuccess = serviceRepo.CreateServiceForBusiness(service, businessID);
+            Service createdService = serviceRepo.CreateServiceForBusiness(serviceDTO, businessID);
 
-            if (isSuccess)
+            if (createdService != null)
             {
-                return CreatedAtAction(nameof(GetServicesForBusiness), new { serviceId = service.PkServiceId }, service);
+                return CreatedAtAction(nameof(GetServicesForBusiness), new { serviceId = createdService.PkServiceId }, createdService);
             }
             return BadRequest();
 
