@@ -1,4 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using OurBeautyReferralNetwork.Controllers;
+using OurBeautyReferralNetwork.Models;
+using OurBeautyReferralNetwork.Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,10 +13,13 @@ namespace OurBeautyReferralNetwork.Utilities
     public class JWTUtilities
     {
         private readonly IConfiguration _configuration;
+        private readonly UserRoleRepo _userRoleRepo;
 
-        public JWTUtilities(IConfiguration configuration)
+        public JWTUtilities(IConfiguration configuration,
+                            UserRoleRepo userRoleRepo)
         {
             _configuration = configuration;
+            _userRoleRepo = userRoleRepo;
         }
 
         public static string GenerateRandomKey(int keyLength)
@@ -23,12 +29,21 @@ namespace OurBeautyReferralNetwork.Utilities
             return Convert.ToBase64String(keyBytes);
         }
 
-        public string GenerateJwtToken(string email)
+        public async Task<string> GenerateJwtToken(string email)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, email)
             };
+
+            var roles = await _userRoleRepo.GetUserRolesAsync(email);
+            if (roles != null)
+            {
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
