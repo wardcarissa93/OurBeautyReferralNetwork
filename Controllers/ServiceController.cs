@@ -91,5 +91,27 @@ namespace OurBeautyReferralNetwork.Controllers
             return BadRequest();
 
         }
+
+
+        [HttpDelete("{serviceId}")]
+        [SwaggerOperation("Delete")]
+        public IActionResult Delete(int serviceId)
+        {
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            string message = serviceRepo.Delete(serviceId);
+            if (message == "Discount does not exist")
+            {
+                return NotFound();
+            }
+            else if (message == "Deleted successfully")
+            {
+                return Ok(); // server successfully processed the request and there is no content to send in the response payload.
+            }
+            else
+            {
+                // Handle other potential error cases, such as database errors
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
