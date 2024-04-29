@@ -123,5 +123,43 @@ namespace OurBeautyReferralNetwork.Repositories
                 return new BadRequestObjectResult($"Error adding business: {ex.Message}");
             }
         }
+
+        public async Task<IActionResult> DeleteBusiness(string businessId)
+        {
+            try
+            {
+                // Find the business by ID
+                var business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(c => c.PkBusinessId == businessId);
+                if (business == null)
+                {
+                    return new NotFoundObjectResult("Business not found");
+                }
+
+                // Find the corresponding AspNetUser by email
+                var user = await _userManager.FindByEmailAsync(business.Email);
+                if (user == null)
+                {
+                    return new NotFoundObjectResult("User not found");
+                }
+
+                // Delete the business
+                _obrnDbContext.Businesses.Remove(business);
+                await _obrnDbContext.SaveChangesAsync();
+
+                // Delete the AspNetUser
+                var result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    // Handle delete user error if needed
+                    return new BadRequestObjectResult("Error deleting user");
+                }
+
+                return new OkObjectResult("Business and associated user deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error deleting business: {ex.Message}");
+            }
+        }
     }
 }
