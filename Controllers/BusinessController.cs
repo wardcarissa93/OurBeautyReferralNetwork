@@ -45,6 +45,13 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
+        [HttpPost("editbusiness")]
+        public async Task<IActionResult> EditBusiness(EditBusiness business)
+        {
+            var result = await _businessRepo.EditBusiness(business);
+            return result;
+        }
+
         [HttpDelete("deletebusiness/{id}")]
         public async Task<IActionResult> DeleteBusiness(string id)
         {
