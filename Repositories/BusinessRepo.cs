@@ -124,6 +124,42 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
+        public async Task<IActionResult> EditBusiness(EditBusiness business)
+        {
+            try
+            {
+                // Check if the business exists in the database
+                var existingBusiness = await _obrnDbContext.Businesses.FirstOrDefaultAsync(b => b.Email == business.Email);
+                if (existingBusiness == null)
+                {
+                    return new NotFoundObjectResult("Business not found");
+                }
+
+                // Update the business's properties
+                existingBusiness.ContactName = business.ContactName;
+                existingBusiness.BusinessName = business.BusinessName;
+                existingBusiness.Address = business.Address;
+                existingBusiness.City = business.City;
+                existingBusiness.Province = business.Province;
+                existingBusiness.PostalCode = business.PostalCode;
+                existingBusiness.Email = business.Email;
+                existingBusiness.Description = business.Description;
+                existingBusiness.Logo = business.Logo;
+                existingBusiness.InsuranceCompany = business.InsuranceCompany;
+                existingBusiness.InsuranceExpiryDate = business.InsuranceExpiryDate;
+                existingBusiness.VerificationDocument = business.VerificationDocument;
+
+                // Save changes to the database
+                await _obrnDbContext.SaveChangesAsync();
+
+                return new OkObjectResult("Business updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error editing customer: {ex.Message}");
+            }
+        }
+
         public async Task<IActionResult> DeleteBusiness(string businessId)
         {
             try
