@@ -115,5 +115,27 @@ namespace OurBeautyReferralNetwork.Repositories
                 return null;
             }
         }
+
+        public string Delete(int serviceId)
+        {
+            try
+            {
+                var service = GetServiceById(serviceId);
+                if (service == null)
+                {
+                    return "Service does not exist";
+                }
+                _obrnContext.Services.Remove(service);
+                _obrnContext.SaveChanges();
+                return "Deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // You can also return a custom error message if needed
+                Console.WriteLine($"Error occurred during delete: {ex.Message}");
+                return "An error occurred during delete";
+            }
+        }
     }
 }
