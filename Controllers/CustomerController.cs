@@ -69,5 +69,12 @@ namespace OurBeautyReferralNetwork.Controllers
             var result = await _customerRepo.EditCustomer(customer);
             return result;
         }
+
+        [HttpDelete("deletecustomer/{id}")]
+        public async Task<IActionResult> DeleteCustomerById(string id)
+        {
+            var result = await _customerRepo.DeleteCustomer(id);
+            return result;
+        }
     }
 }
