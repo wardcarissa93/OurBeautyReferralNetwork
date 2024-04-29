@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using OurBeautyReferralNetwork.Controllers;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
@@ -14,12 +15,15 @@ namespace OurBeautyReferralNetwork.Utilities
     {
         private readonly IConfiguration _configuration;
         private readonly UserRoleRepo _userRoleRepo;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public JWTUtilities(IConfiguration configuration,
-                            UserRoleRepo userRoleRepo)
+                            UserRoleRepo userRoleRepo,
+                            UserManager<IdentityUser> userManager)
         {
             _configuration = configuration;
             _userRoleRepo = userRoleRepo;
+            _userManager = userManager;
         }
 
         public static string GenerateRandomKey(int keyLength)
@@ -31,9 +35,16 @@ namespace OurBeautyReferralNetwork.Utilities
 
         public async Task<string> GenerateJwtToken(string email)
         {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new ApplicationException("User not found.");
+            }
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, email)
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
             var roles = await _userRoleRepo.GetUserRolesAsync(email);
