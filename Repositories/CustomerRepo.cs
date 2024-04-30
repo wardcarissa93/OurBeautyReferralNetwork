@@ -174,6 +174,46 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
+        public async Task<IActionResult> UpdatePassword(EditPassword password)
+        {
+            try
+            {
+                // Find the user by ID
+                var user = await _userManager.FindByIdAsync(password.UserId);
+                if (user == null)
+                {
+                    return new NotFoundObjectResult("User not found");
+                }
+
+                // Check if the current password matches
+                var passwordCheck = await _userManager.CheckPasswordAsync(user, password.CurrentPassword);
+                if (!passwordCheck)
+                {
+                    return new BadRequestObjectResult("Incorrect current password");
+                }
+
+                // Check if the new password matches the confirmation password
+                if (password.NewPassword != password.ConfirmPassword)
+                {
+                    return new BadRequestObjectResult("New password and confirmation password do not match");
+                }
+
+                // Update the user's password
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, password.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    return new OkObjectResult("Password updated successfully");
+                }
+                return new BadRequestObjectResult("Error updating password");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error updating password: {ex.Message}");
+            }
+        }
+
         public async Task<IActionResult> DeleteCustomer(string customerId)
         {
             try
