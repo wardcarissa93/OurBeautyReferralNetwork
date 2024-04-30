@@ -236,7 +236,7 @@ public partial class obrnDbContext : DbContext
             entity.ToTable("Discount");
 
             entity.Property(e => e.PkDiscountId)
-                .HasMaxLength(5)
+                .HasMaxLength(10)
                 .HasColumnName("pkDiscountID");
         });
 
@@ -265,7 +265,9 @@ public partial class obrnDbContext : DbContext
 
             entity.ToTable("Referral");
 
-            entity.Property(e => e.PkReferralId).HasColumnName("pkReferralID");
+            entity.Property(e => e.PkReferralId)
+                .HasMaxLength(8)
+                .HasColumnName("pkReferralID");
             entity.Property(e => e.FkReferredBusinessId)
                 .HasMaxLength(30)
                 .HasColumnName("fkReferredBusinessID");
@@ -333,7 +335,9 @@ public partial class obrnDbContext : DbContext
             entity.ToTable("Reward");
 
             entity.Property(e => e.PkRewardId).HasColumnName("pkRewardID");
-            entity.Property(e => e.FkReferralId).HasColumnName("fkReferralID");
+            entity.Property(e => e.FkReferralId)
+                .HasMaxLength(8)
+                .HasColumnName("fkReferralID");
 
             entity.HasOne(d => d.FkReferral).WithMany(p => p.Rewards)
                 .HasForeignKey(d => d.FkReferralId)
@@ -383,7 +387,7 @@ public partial class obrnDbContext : DbContext
 
             entity.Property(e => e.PkTestimonialId).HasColumnName("pkTestimonialId");
             entity.Property(e => e.Approved).HasDefaultValue(false);
-            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.FkBusinessId)
                 .HasMaxLength(30)
                 .HasColumnName("fkBusinessID");
