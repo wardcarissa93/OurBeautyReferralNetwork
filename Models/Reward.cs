@@ -7,7 +7,7 @@ public partial class Reward
 {
     public int PkRewardId { get; set; }
 
-    public int FkReferralId { get; set; }
+    public string FkReferralId { get; set; } = null!;
 
     public decimal RewardAmount { get; set; }
 

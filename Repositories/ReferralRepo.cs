@@ -1,4 +1,6 @@
-﻿using OurBeautyReferralNetwork.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 
 namespace OurBeautyReferralNetwork.Repositories
@@ -16,18 +18,62 @@ namespace OurBeautyReferralNetwork.Repositories
 
         public IEnumerable<Referral> GetAllReferrals()
         {
-            return _obrnContext.Referrals.ToList();
+            IEnumerable<Referral> referrals = _obrnContext.Referrals.ToList();
+            return referrals;
         }
-
-        public Referral GetReferralById(int referralId)
+        public async Task<IActionResult> GetReferralById(string referralId)
         {
-            var referral = _obrnContext.Referrals.FirstOrDefault(r => r.PkReferralId == referralId);
-            if (referral == null)
+            try
             {
-                return null; // Return a 404 Not Found response if feeId does not exist
+                var referral = await _obrnContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralId);
+                if (referral != null)
+                {
+                    return new OkObjectResult(referral);
+                }
+                else
+                {
+                    return new NotFoundObjectResult("Referral not found.");
+                }
             }
-            return referral;
+            catch (Exception ex) 
+            { 
+                return new BadRequestObjectResult($"Error getting referral: {ex.Message}");
+            }
         }
 
+        public async Task<IActionResult> CreateReferralCodeForCustomer(string customerId)
+        {
+            try
+            {
+                // Generate a random 8-character alphanumeric string
+                string referralId;
+                Random random = new Random();
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+                do
+                {
+                    referralId = new string(Enumerable.Repeat(chars, 8).Select(s => s[random.Next(s.Length)]).ToArray());
+                } while (_obrnContext.Referrals.Any(r => r.PkReferralId == referralId));
+
+                // Create a new Referral object
+                Referral newReferral = new Referral
+                {
+                    PkReferralId = referralId,
+                    FkReferredCustomerId = customerId,
+                    ReferralDate = DateOnly.FromDateTime(DateTime.Today),
+                    Status = "pending",
+                    ReferredType = "C"
+                };
+
+                // Add and save the new Referral
+                _obrnContext.Referrals.Add(newReferral);
+                await _obrnContext.SaveChangesAsync();
+
+                return new OkObjectResult(new { Message = "Referral created successfully", ReferralId = referralId }); ;
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error creating referral: {ex.Message}");
+            }
+        }
     }
 }
