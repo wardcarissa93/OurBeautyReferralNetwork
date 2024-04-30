@@ -122,12 +122,8 @@ namespace OurBeautyReferralNetwork.Repositories
                         {
                             return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
                         }
-                        else
-                        {
-                            return referralResult;
-                        }
 
-                        return new OkObjectResult(new { Message = "Customer added successfully", Token = token });
+                        return referralResult;
                     }
 
                     return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
