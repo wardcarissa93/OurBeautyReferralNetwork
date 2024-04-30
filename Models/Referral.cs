@@ -5,7 +5,7 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Referral
 {
-    public int PkReferralId { get; set; }
+    public string PkReferralId { get; set; } = null!;
 
     public string? FkReferrerCustomerId { get; set; }
 
