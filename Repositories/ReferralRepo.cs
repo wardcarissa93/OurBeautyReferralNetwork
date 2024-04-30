@@ -75,5 +75,40 @@ namespace OurBeautyReferralNetwork.Repositories
                 return new BadRequestObjectResult($"Error creating referral: {ex.Message}");
             }
         }
+
+        public async Task<IActionResult> CreateReferralCodeForBusiness(string businessId)
+        {
+            try
+            {
+                // Generate a random 8-character alphanumeric string
+                string referralId;
+                Random random = new Random();
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+                do
+                {
+                    referralId = new string(Enumerable.Repeat(chars, 8).Select(s => s[random.Next(s.Length)]).ToArray());
+                } while (_obrnContext.Referrals.Any(r => r.PkReferralId == referralId));
+
+                // Create a new Referral object
+                Referral newReferral = new Referral
+                {
+                    PkReferralId = referralId,
+                    FkReferrerBusinessId = businessId,
+                    ReferralDate = DateOnly.FromDateTime(DateTime.Today),
+                    Status = "pending",
+                    ReferredType = "B"
+                };
+
+                // Add and save the new Referral
+                _obrnContext.Referrals.Add(newReferral);
+                await _obrnContext.SaveChangesAsync();
+
+                return new OkObjectResult(new { Message = "Referral created successfully", ReferralId = referralId }); ;
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error creating referral: {ex.Message}");
+            }
+        }
     }
 }
