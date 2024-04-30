@@ -70,6 +70,13 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
+        [HttpPost("updatepassword")]
+        public async Task<IActionResult> UpdatePassword(EditPassword password)
+        {
+            var result = await _customerRepo.UpdatePassword(password);
+            return result;
+        }
+
         [HttpDelete("deletecustomer/{id}")]
         public async Task<IActionResult> DeleteCustomerById(string id)
         {
