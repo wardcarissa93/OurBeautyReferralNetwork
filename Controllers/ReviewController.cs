@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
@@ -57,6 +58,51 @@ namespace OurBeautyReferralNetwork.Controllers
             ReviewRepo reviewRepo = new ReviewRepo(_context, _obrnContext);
             var reviews = reviewRepo.GetAllReviews();
             return Ok(reviews);
+        }
+
+        [HttpGet]
+        [SwaggerOperation("GetReviewsForBusiness")]
+        public virtual IActionResult GetReviewsForBusiness(string businessId)
+        {
+            ReviewRepo reviewRepo = new ReviewRepo(_context, _obrnContext);
+            var reviews = reviewRepo.GetAllReviewsForBusiness(businessId);
+            return Ok(reviews);
+        }
+
+        [HttpPost]
+        [Route("/review/create")]
+        public IActionResult CreateForBusiness(ReviewDTO reviewDTO, string businessID)
+        {
+            ReviewRepo reviewRepo = new ReviewRepo(_context, _obrnContext);
+            Review createdReview = reviewRepo.CreateReviewForBusiness(reviewDTO, businessID);
+
+            if (createdReview != null)
+            {
+                return CreatedAtAction(nameof(GetReviewsForBusiness), new { businessID = createdReview.PkReviewId }, createdReview);
+            }
+            return BadRequest();
+
+        }
+
+        [HttpDelete("{reviewId}")]
+        [SwaggerOperation("Delete")]
+        public IActionResult Delete(int reviewId)
+        {
+            ReviewRepo reviewRepo = new ReviewRepo(_context, _obrnContext);
+            string message = reviewRepo.Delete(reviewId);
+            if (message == "Review does not exist")
+            {
+                return NotFound();
+            }
+            else if (message == "Deleted successfully")
+            {
+                return Ok(); // server successfully processed the request and there is no content to send in the response payload.
+            }
+            else
+            {
+                // Handle other potential error cases, such as database errors
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }
