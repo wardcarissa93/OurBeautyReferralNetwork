@@ -12,6 +12,7 @@ using OurBeautyReferralNetwork.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks.Dataflow;
 
 namespace OurBeautyReferralNetwork.Controllers
 {
@@ -50,8 +51,10 @@ namespace OurBeautyReferralNetwork.Controllers
             }
             decimal? discountPercentage = serviceRepo.GetServiceDiscount(serviceId);
             decimal actualDiscount = discountPercentage ?? 0;
+            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+            Discount discount = discountRepo.GetDiscountById(service.FkDiscountId);
 
-            var extendedService = service.ExtendService(actualDiscount);
+            var extendedService = service.ExtendService(discount);
             return Ok(extendedService);
         }
 
@@ -92,6 +95,17 @@ namespace OurBeautyReferralNetwork.Controllers
 
         }
 
+        [HttpPut("{serviceId}")]
+        public IActionResult Update (string businessID, ServiceDTO serviceDTO)
+        {
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, businessID);
+            if (!isSuccess)
+            {
+                return NotFound("Service not found with the provided ID.");
+            }
+            return Ok();
+        }
 
         [HttpDelete("{serviceId}")]
         [SwaggerOperation("Delete")]

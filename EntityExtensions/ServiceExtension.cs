@@ -1,11 +1,12 @@
 ﻿using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
+using OurBeautyReferralNetwork.Repositories;
 
 namespace OurBeautyReferralNetwork.EntityExtensions
 {
     public static class ServiceExtension
     {
-        public static ServiceDTO ExtendService(this Models.Service service, decimal discountPercentage)
+        public static ServiceDTO ExtendService(this Models.Service service, Discount discount)
         {
             return new ServiceDTO
             {
@@ -13,9 +14,11 @@ namespace OurBeautyReferralNetwork.EntityExtensions
                 ServiceName = service.ServiceName,
                 Image = service.Image,
                 FkBusinessId = service.FkBusinessId,
+                FkDiscountId = service.FkDiscountId,
+                Description = service.Description,
                 FkCategoryId = service.FkCategoryId,
                 BasePrice = service.BasePrice,
-                FkDiscount = new Discount { Percentage = discountPercentage }
+                FkDiscount = discount
             };
         }
     }

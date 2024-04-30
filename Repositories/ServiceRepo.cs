@@ -30,8 +30,10 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
                 decimal actualDiscount = discountPercentage ?? 0;
+                DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+                Discount discount = discountRepo.GetDiscountById(service.FkDiscountId);
 
-                return service.ExtendService(actualDiscount);
+                return service.ExtendService(discount);
             });
 
             return extendedServices;
@@ -61,12 +63,12 @@ namespace OurBeautyReferralNetwork.Repositories
                         where s.PkServiceId == serviceId
                         select new
                         {
-                            DiscountPrice = s.BasePrice - (s.BasePrice * d.Percentage)
+                            DiscountPercentage = s.BasePrice - (s.BasePrice * d.Percentage)
                         };
 
             var result = query.FirstOrDefault();
 
-            return result?.DiscountPrice;
+            return result?.DiscountPercentage;
         }
 
 
@@ -80,8 +82,10 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
                 decimal actualDiscount = discountPercentage ?? 0;
+                DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+                Discount discount = discountRepo.GetDiscountById(service.FkDiscountId);
 
-                return service.ExtendService(actualDiscount);
+                return service.ExtendService(discount);
             });
 
             return null;
@@ -114,6 +118,40 @@ namespace OurBeautyReferralNetwork.Repositories
                 Console.WriteLine(ex.ToString());
                 return null;
             }
+        }
+
+        public bool EditServiceForBusiness(ServiceDTO serviceDTO, string businessId)
+        {
+            DiscountRepo discountRepo = new DiscountRepo (_context, _obrnContext);
+            Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
+            Service service = GetServiceById(serviceDTO.PkServiceId);
+            if (service != null)
+            {
+                service.PkServiceId = serviceDTO.PkServiceId;
+                service.Image = serviceDTO.Image;
+                service.FkBusinessId = businessId;
+                service.ServiceName = serviceDTO.ServiceName;
+                service.Description = serviceDTO.Description;
+                service.FkDiscountId = serviceDTO.FkDiscountId;
+                service.BasePrice = serviceDTO.BasePrice;
+                service.FkDiscount = discount;
+                service.FkCategoryId = serviceDTO.FkCategoryId;
+
+                try
+                {
+                    _obrnContext.SaveChanges();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+            
         }
 
         public string Delete(int serviceId)
