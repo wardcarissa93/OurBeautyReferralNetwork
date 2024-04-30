@@ -14,14 +14,17 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly JWTUtilities _jWTUtilities;
         private readonly obrnDbContext _obrnDbContext;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ReferralRepo _referralRepo;
 
         public CustomerRepo(JWTUtilities jWTUtilities,
                             obrnDbContext obrnDbContext,
-                            UserManager<IdentityUser> userManager)
+                            UserManager<IdentityUser> userManager,
+                            ReferralRepo referralRepo)
         {
             _jWTUtilities = jWTUtilities;
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
+            _referralRepo = referralRepo;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -112,6 +115,17 @@ namespace OurBeautyReferralNetwork.Repositories
                     {
                         // Generate JWT for the added customer
                         var token = _jWTUtilities.GenerateJwtToken(customer.Email);
+
+                        // Create a referral code for the customer
+                        var referralResult = await _referralRepo.CreateReferralCodeForCustomer(customer.PkCustomerId);
+                        if (referralResult is OkObjectResult referralOkResult)
+                        {
+                            return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
+                        }
+                        else
+                        {
+                            return referralResult;
+                        }
 
                         return new OkObjectResult(new { Message = "Customer added successfully", Token = token });
                     }

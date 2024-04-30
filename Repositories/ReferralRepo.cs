@@ -58,7 +58,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 Referral newReferral = new Referral
                 {
                     PkReferralId = referralId,
-                    FkReferredCustomerId = customerId,
+                    FkReferrerCustomerId = customerId,
                     ReferralDate = DateOnly.FromDateTime(DateTime.Today),
                     Status = "pending",
                     ReferredType = "C"
