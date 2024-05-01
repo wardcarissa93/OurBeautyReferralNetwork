@@ -14,14 +14,17 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly JWTUtilities _jWTUtilities;
         private readonly obrnDbContext _obrnDbContext;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ReferralRepo _referralRepo;
 
         public CustomerRepo(JWTUtilities jWTUtilities,
                             obrnDbContext obrnDbContext,
-                            UserManager<IdentityUser> userManager)
+                            UserManager<IdentityUser> userManager,
+                            ReferralRepo referralRepo)
         {
             _jWTUtilities = jWTUtilities;
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
+            _referralRepo = referralRepo;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -102,17 +105,31 @@ namespace OurBeautyReferralNetwork.Repositories
                     Email = customer.Email
                 };
 
-                var result = await _userManager.CreateAsync(user, customer.Password);
+                var addUserResult = await _userManager.CreateAsync(user, customer.Password);
 
-                if (result.Succeeded)
+                if (addUserResult.Succeeded)
                 {
-                    // Generate JWT for the added customer
-                    var token = _jWTUtilities.GenerateJwtToken(customer.Email);
+                    var addUserRoleResult = await _userManager.AddToRoleAsync(user, "customer");
 
-                    return new OkObjectResult(new { Message = "Customer added successfully", Token = token });
+                    if (addUserRoleResult.Succeeded)
+                    {
+                        // Generate JWT for the added customer
+                        var token = _jWTUtilities.GenerateJwtToken(customer.Email);
+
+                        // Create a referral code for the customer
+                        var referralResult = await _referralRepo.CreateReferralCodeForCustomer(customer.PkCustomerId);
+                        if (referralResult is OkObjectResult referralOkResult)
+                        {
+                            return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
+                        }
+
+                        return referralResult;
+                    }
+
+                    return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
                 }
 
-                return new BadRequestObjectResult(new { Errors = result.Errors });
+                return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
             }
             catch (Exception ex)
             {
@@ -164,6 +181,84 @@ namespace OurBeautyReferralNetwork.Repositories
             catch (Exception ex)
             {
                 return new BadRequestObjectResult($"Error editing customer: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> UpdatePassword(EditPassword password)
+        {
+            try
+            {
+                // Find the user by ID
+                var user = await _userManager.FindByIdAsync(password.UserId);
+                if (user == null)
+                {
+                    return new NotFoundObjectResult("User not found");
+                }
+
+                // Check if the current password matches
+                var passwordCheck = await _userManager.CheckPasswordAsync(user, password.CurrentPassword);
+                if (!passwordCheck)
+                {
+                    return new BadRequestObjectResult("Incorrect current password");
+                }
+
+                // Check if the new password matches the confirmation password
+                if (password.NewPassword != password.ConfirmPassword)
+                {
+                    return new BadRequestObjectResult("New password and confirmation password do not match");
+                }
+
+                // Update the user's password
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, password.NewPassword);
+
+                if (result.Succeeded)
+                {
+                    return new OkObjectResult("Password updated successfully");
+                }
+                return new BadRequestObjectResult("Error updating password");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error updating password: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> DeleteCustomer(string customerId)
+        {
+            try
+            {
+                // Find the customer by ID
+                var customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customerId);
+                if (customer == null)
+                {
+                    return new NotFoundObjectResult("Customer not found");
+                }
+
+                // Find the corresponding AspNetUser by email
+                var user = await _userManager.FindByEmailAsync(customer.Email);
+                if (user == null)
+                {
+                    return new NotFoundObjectResult("User not found");
+                }
+
+                // Delete the customer
+                _obrnDbContext.Customers.Remove(customer);
+                await _obrnDbContext.SaveChangesAsync();
+
+                // Delete the AspNetUser
+                var result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    // Handle delete user error if needed
+                    return new BadRequestObjectResult("Error deleting user");
+                }
+
+                return new OkObjectResult("Customer and associated user deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error deleting customer: {ex.Message}");
             }
         }
     }

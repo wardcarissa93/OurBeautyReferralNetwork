@@ -27,7 +27,10 @@ Console.WriteLine($"Connection string: {connectionString}");
 
 builder.Services.AddScoped<CustomerRepo>();
 builder.Services.AddScoped<BusinessRepo>();
+builder.Services.AddScoped<RoleRepo>();
+builder.Services.AddScoped<UserRoleRepo>();
 builder.Services.AddScoped<JWTUtilities>();
+builder.Services.AddScoped<ReferralRepo>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block
 //using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
@@ -82,6 +85,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
 })
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
