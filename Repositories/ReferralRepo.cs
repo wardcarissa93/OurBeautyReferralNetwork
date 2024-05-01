@@ -19,15 +19,15 @@ namespace OurBeautyReferralNetwork.Repositories
             return _obrnContext.Referrals.ToList();
         }
 
-        public Referral GetReferralById(int referralId)
-        {
-            var referral = _obrnContext.Referrals.FirstOrDefault(r => r.PkReferralId == referralId);
-            if (referral == null)
-            {
-                return null; // Return a 404 Not Found response if feeId does not exist
-            }
-            return referral;
-        }
+        //public Referral GetReferralById(int referralId)
+        //{
+        //    var referral = _obrnContext.Referrals.FirstOrDefault(r => r.PkReferralId == referralId);
+        //    if (referral == null)
+        //    {
+        //        return null; // Return a 404 Not Found response if feeId does not exist
+        //    }
+        //    return referral;
+        //}
 
     }
 }
