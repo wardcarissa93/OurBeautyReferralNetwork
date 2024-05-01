@@ -82,10 +82,10 @@ namespace OurBeautyReferralNetwork.Controllers
 
         [HttpPost]
         [Route("/service/create")]
-        public IActionResult CreateForBusiness(ServiceDTO serviceDTO, string businessID)
+        public IActionResult CreateForBusiness(ServiceDTO serviceDTO)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            Service createdService = serviceRepo.CreateServiceForBusiness(serviceDTO, businessID);
+            Service createdService = serviceRepo.CreateServiceForBusiness(serviceDTO);
 
             if (createdService != null)
             {

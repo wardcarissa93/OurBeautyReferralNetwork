@@ -39,7 +39,7 @@ builder.Services.AddScoped<ReferralRepo>();
 //    conn.Open();
 
 //    // Read rows
-//    NpgsqlCommand selectCommand = new NpgsqlCommand("SELECT * FROM FeeAndCommission", conn);
+//    NpgsqlCommand selectCommand = new NpgsqlCommand("SELECT * FROM \"Discount\"", conn);
 //    NpgsqlDataReader results = selectCommand.ExecuteReader();
 
 //    // Enumerate over the rows
