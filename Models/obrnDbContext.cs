@@ -53,7 +53,7 @@ public partial class obrnDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=beauty-network.postgres.database.azure.com;Database=postgres;Port=5432;Username=beauty_network;Password=P@ssw0rd!;SSL Mode=Require;Trust Server Certificate=true;");
+        => optionsBuilder.UseNpgsql("Host=obrn-postgresql-dev.postgres.database.azure.com;Database=postgres;Port=5432;Username=CraigWatson;Password=P@ssw0rd!;SSL Mode=Require;Trust Server Certificate=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -358,7 +358,7 @@ public partial class obrnDbContext : DbContext
                 .HasColumnName("fkBusinessID");
             entity.Property(e => e.FkCategoryId).HasColumnName("fkCategoryID");
             entity.Property(e => e.FkDiscountId)
-                .HasMaxLength(5)
+                .HasMaxLength(10)
                 .HasColumnName("fkDiscountID");
             entity.Property(e => e.Image).HasMaxLength(255);
             entity.Property(e => e.ServiceName).HasMaxLength(255);
