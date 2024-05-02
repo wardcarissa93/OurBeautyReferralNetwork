@@ -7,7 +7,8 @@ using Npgsql;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
-using OurBeautyReferralNetwork.Utilities; 
+using OurBeautyReferralNetwork.Utilities;
+using Stripe;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,11 +106,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         builder =>
         {
-            builder.WithOrigins("http://localhost:5173")
+            builder.WithOrigins("https://calm-hill-024d52d1e.5.azurestaticapps.net/")
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
 });
+
+// Set Stripe API Key
+StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
+
 
 var app = builder.Build();
 
