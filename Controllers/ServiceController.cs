@@ -80,6 +80,17 @@ namespace OurBeautyReferralNetwork.Controllers
             return Ok(services);
         }
 
+        [HttpGet]
+        [Route("/service/{businessId}/{serviceId}")]
+        //[ValidateModelState]
+        [SwaggerOperation("GetServiceForBusiness")]
+        public virtual IActionResult GetServiceForBusiness(string businessId, int serviceId)
+        {
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            var services = serviceRepo.GetAllServicesOfBusiness(businessId);
+            return Ok(services);
+        }
+
         [HttpPost]
         [Route("/service/create")]
         public IActionResult CreateForBusiness(ServiceDTO serviceDTO)

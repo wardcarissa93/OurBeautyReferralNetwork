@@ -91,6 +91,25 @@ namespace OurBeautyReferralNetwork.Repositories
             return null;
         }
 
+        public ServiceDTO GetServiceOfBusiness(string businessId, int serviceId)
+        {
+            var service = _obrnContext.Services
+                .FirstOrDefault(s => s.FkBusinessId == businessId && s.PkServiceId == serviceId);
+
+            if (service != null)
+            {
+                decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
+                decimal actualDiscount = discountPercentage ?? 0;
+                DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+                Discount discount = discountRepo.GetDiscountById(service.FkDiscountId);
+
+                return service.ExtendService(discount);
+            }
+
+
+            return null;
+        }
+
         public Service CreateServiceForBusiness(ServiceDTO serviceDTO)
         {
             DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
