@@ -70,7 +70,7 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        //[Route("/service")]
+        [Route("/service/{businessId}")]
         //[ValidateModelState]
         [SwaggerOperation("GetServicesForBusiness")]
         public virtual IActionResult GetServicesForBusiness(string businessId)
