@@ -148,16 +148,15 @@ namespace OurBeautyReferralNetwork.Repositories
                 return null;
             }
         }
-        public bool EditServiceForBusiness(ServiceDTO serviceDTO, string businessId)
+        public bool EditServiceForBusiness(ServiceDTO serviceDTO, int serviceId)
         {
             DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
             Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
-            Service service = GetServiceById(serviceDTO.PkServiceId);
+            Service service = GetServiceById(serviceId);
             if (service != null)
             {
-                service.PkServiceId = serviceDTO.PkServiceId;
                 service.Image = serviceDTO.Image;
-                service.FkBusinessId = businessId;
+                service.FkBusinessId = serviceDTO.FkBusinessId;
                 service.ServiceName = serviceDTO.ServiceName;
                 service.Description = serviceDTO.Description;
                 service.FkDiscountId = serviceDTO.FkDiscountId;

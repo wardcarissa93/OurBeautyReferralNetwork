@@ -113,10 +113,10 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPut("{serviceId}")]
-        public IActionResult Update (string businessID, ServiceDTO serviceDTO)
+        public IActionResult Update (int serviceId, ServiceDTO serviceDTO)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, businessID);
+            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, serviceId);
             if (!isSuccess)
             {
                 return NotFound("Service not found with the provided ID.");
