@@ -72,24 +72,36 @@ namespace OurBeautyReferralNetwork.Repositories
         }
 
 
-        public IEnumerable<Service> GetAllServicesOfBusiness(string businessId)
+        public IEnumerable<ServiceDTO> GetAllServicesOfBusiness(string businessId)
         {
-            var services =  _obrnContext.Services
+            var services = _obrnContext.Services
                 .Where(s => s.FkBusinessId == businessId)
                 .ToList();
 
+            // Convert the LINQ query to a list to materialize the results
             var extendedServices = services.Select(service =>
             {
                 decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
+                Console.WriteLine(discountPercentage);
                 decimal actualDiscount = discountPercentage ?? 0;
+                Console.WriteLine(actualDiscount);
                 DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
                 Discount discount = discountRepo.GetDiscountById(service.FkDiscountId);
+                Console.WriteLine(discount.ToString());
 
-                return service.ExtendService(discount);
-            });
+                // Log before extending the service
+                Console.WriteLine($"Extending service ID: {service.PkServiceId} with discount ID: {service.FkDiscountId}");
 
-            return null;
+                // Call ExtendService and log result
+                var extendedService = service.ExtendService(discount);
+                Console.WriteLine($"Extended service created for service ID: {service.PkServiceId}");
+
+                return extendedService;
+            }).ToList(); // Materialize the query to a list
+
+            return extendedServices; // Now you can return the list of extended services
         }
+
 
         public ServiceDTO GetServiceOfBusiness(string businessId, int serviceId)
         {
@@ -136,10 +148,9 @@ namespace OurBeautyReferralNetwork.Repositories
                 return null;
             }
         }
-
         public bool EditServiceForBusiness(ServiceDTO serviceDTO, string businessId)
         {
-            DiscountRepo discountRepo = new DiscountRepo (_context, _obrnContext);
+            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
             Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
             Service service = GetServiceById(serviceDTO.PkServiceId);
             if (service != null)
@@ -168,7 +179,7 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 return false;
             }
-            
+
         }
 
         public string Delete(int serviceId)
