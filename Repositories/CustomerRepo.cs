@@ -15,16 +15,19 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly obrnDbContext _obrnDbContext;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ReferralRepo _referralRepo;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
         public CustomerRepo(JWTUtilities jWTUtilities,
                             obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
-                            ReferralRepo referralRepo)
+                            ReferralRepo referralRepo,
+                            SignInManager<IdentityUser> signInManager)
         {
             _jWTUtilities = jWTUtilities;
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
             _referralRepo = referralRepo;
+            _signInManager = signInManager;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -77,65 +80,72 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                // Check if a customer with the same PkCustomerId already exists
-                var existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
-                if (existingCustomer != null)
+                using (var dbContext = new obrnDbContext())
                 {
-                    return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
-                }
-
-                Customer newCustomer = new Customer
-                {
-                    PkCustomerId = customer.PkCustomerId,
-                    FirstName = customer.FirstName,
-                    LastName = customer.LastName,
-                    Phone = customer.Phone,
-                    Birthdate = customer.Birthdate,
-                    Email = customer.Email,
-                    Vip = customer.Vip,
-                    Confirm18 = customer.Confirm18
-                };
-
-                _obrnDbContext.Customers.Add(newCustomer);
-                await _obrnDbContext.SaveChangesAsync();
-
-                var user = new IdentityUser
-                {
-                    UserName = customer.PkCustomerId,
-                    Email = customer.Email
-                };
-
-                var addUserResult = await _userManager.CreateAsync(user, customer.Password);
-
-                if (addUserResult.Succeeded)
-                {
-                    var addUserRoleResult = await _userManager.AddToRoleAsync(user, "customer");
-
-                    if (addUserRoleResult.Succeeded)
+                    var existingCustomer = await dbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
+                    if (existingCustomer != null)
                     {
-                        // Generate JWT for the added customer
-                        var token = _jWTUtilities.GenerateJwtToken(customer.Email);
-
-                        // Create a referral code for the customer
-                        var referralResult = await _referralRepo.CreateReferralCodeForCustomer(customer.PkCustomerId);
-                        if (referralResult is OkObjectResult referralOkResult)
-                        {
-                            return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
-                        }
-
-                        return referralResult;
+                        return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
                     }
 
-                    return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
-                }
+                    var newCustomer = new Customer
+                    {
+                        PkCustomerId = customer.PkCustomerId,
+                        FirstName = customer.FirstName,
+                        LastName = customer.LastName,
+                        Phone = customer.Phone,
+                        Birthdate = customer.Birthdate,
+                        Email = customer.Email,
+                        Vip = customer.Vip,
+                        Confirm18 = customer.Confirm18
+                    };
 
-                return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
+                    dbContext.Customers.Add(newCustomer);
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine("New customer added");
+
+                    var user = new IdentityUser
+                    {
+                        UserName = customer.PkCustomerId,
+                        Email = customer.Email
+                    };
+
+                    var addUserResult = await _userManager.CreateAsync(user, customer.Password);
+
+                    if (addUserResult.Succeeded)
+                    {
+                        Console.WriteLine("New user added");
+                        var addUserRoleResult = await _userManager.AddToRoleAsync(user, "customer");
+
+                        if (addUserRoleResult.Succeeded)
+                        {
+                            Console.WriteLine("Customer role added to new user");
+                            var token = _jWTUtilities.GenerateJwtToken(customer.Email);
+                            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(customer.PkCustomerId);
+
+                            if (referralResult is OkObjectResult referralOkResult)
+                            {
+                                Console.WriteLine("Referral code created");
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+                                Console.WriteLine("User logged in");
+                                return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
+                            }
+
+                            return referralResult;
+                        }
+
+                        return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
+                    }
+
+                    return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
+                }
             }
             catch (Exception ex)
             {
                 return new BadRequestObjectResult($"Error adding customer: {ex.Message}");
             }
         }
+
         public async Task<IActionResult> Login(User model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
