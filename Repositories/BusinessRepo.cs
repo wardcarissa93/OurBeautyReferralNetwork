@@ -13,16 +13,19 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly UserManager<IdentityUser> _userManager;
         private readonly JWTUtilities _jwtUtilities;
         private readonly ReferralRepo _referralRepo;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
         public BusinessRepo(obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
                             JWTUtilities jWTUtilities,
-                            ReferralRepo referralRepo)
+                            ReferralRepo referralRepo,
+                            SignInManager<IdentityUser> signInManager)
         {
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
             _jwtUtilities = jWTUtilities;
             _referralRepo = referralRepo;
+            _signInManager = signInManager;
         }
 
         public IEnumerable<Business> GetAllBusinesses()
@@ -75,59 +78,69 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                Business newBusiness = new Business
+                using (var dbContext = new obrnDbContext())
                 {
-                    PkBusinessId = business.PkBusinessId,
-                    BusinessName = business.BusinessName,
-                    Logo = business.Logo,
-                    ContactName = business.ContactName,
-                    Address = business.Address,
-                    City = business.City,
-                    Province = business.Province,
-                    PostalCode = business.PostalCode,
-                    Email = business.Email,
-                    Phone = business.Phone,
-                    InsuranceCompany = business.InsuranceCompany,
-                    InsuranceExpiryDate = business.InsuranceExpiryDate,
-                    RegistrationDate = DateOnly.FromDateTime(DateTime.Today),
-                    CommissionPaid = false,
-                    VerificationDocument = business.VerificationDocument,
-                    IsVerified = false,
-                };
-
-                _obrnDbContext.Businesses.Add(newBusiness);
-                await _obrnDbContext.SaveChangesAsync();
-
-                var user = new IdentityUser
-                {
-                    UserName = business.PkBusinessId,
-                    Email = business.Email
-                };
-
-                var addUserResult = await _userManager.CreateAsync(user, business.Password);
-
-                if (addUserResult.Succeeded)
-                {
-                    var addUserRoleResult = await _userManager.AddToRoleAsync(user, "business");
-                    if (addUserRoleResult.Succeeded)
+                    var existingBusiness = await dbContext.Businesses.FirstOrDefaultAsync(b => b.PkBusinessId == business.PkBusinessId);
+                    if (existingBusiness != null)
                     {
-                        // Generate JWT for the added business
-                        var token = _jwtUtilities.GenerateJwtToken(business.Email);
-
-                        // Create a referral code for the business
-                        var referralResult = await _referralRepo.CreateReferralCodeForBusiness(business.PkBusinessId);
-                        if (referralResult is OkObjectResult referralOkResult)
-                        {
-                            return new OkObjectResult(new { Message = "Business added successfully", Token = token, ReferralId = referralOkResult.Value });
-                        }
-
-                        return referralResult;
+                        return new BadRequestObjectResult("Username unavailable. Please enter a different username");
                     }
 
-                    return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
-                }
+                    Business newBusiness = new Business
+                    {
+                        PkBusinessId = business.PkBusinessId,
+                        BusinessName = business.BusinessName,
+                        Logo = business.Logo,
+                        ContactName = business.ContactName,
+                        Address = business.Address,
+                        City = business.City,
+                        Province = business.Province,
+                        PostalCode = business.PostalCode,
+                        Email = business.Email,
+                        Phone = business.Phone,
+                        InsuranceCompany = business.InsuranceCompany,
+                        InsuranceExpiryDate = business.InsuranceExpiryDate,
+                        RegistrationDate = DateOnly.FromDateTime(DateTime.Today),
+                        CommissionPaid = false,
+                        VerificationDocument = business.VerificationDocument,
+                        IsVerified = false,
+                    };
 
-                return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
+                    _obrnDbContext.Businesses.Add(newBusiness);
+                    await _obrnDbContext.SaveChangesAsync();
+
+                    var user = new IdentityUser
+                    {
+                        UserName = business.PkBusinessId,
+                        Email = business.Email
+                    };
+
+                    var addUserResult = await _userManager.CreateAsync(user, business.Password);
+
+                    if (addUserResult.Succeeded)
+                    {
+                        var addUserRoleResult = await _userManager.AddToRoleAsync(user, "business");
+                        if (addUserRoleResult.Succeeded)
+                        {
+                            // Generate JWT for the added business
+                            var token = _jwtUtilities.GenerateJwtToken(business.Email);
+
+                            // Create a referral code for the business
+                            var referralResult = await _referralRepo.CreateReferralCodeForBusiness(business.PkBusinessId);
+                            if (referralResult is OkObjectResult referralOkResult)
+                            {
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+                                return new OkObjectResult(new { Message = "Business added successfully", Token = token, ReferralId = referralOkResult.Value });
+                            }
+
+                            return referralResult;
+                        }
+
+                        return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
+                    }
+
+                    return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
+                }
             }
             catch (Exception ex)
             {

@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.Models;
@@ -10,6 +12,7 @@ using OurBeautyReferralNetwork.Repositories;
 using OurBeautyReferralNetwork.Utilities;
 using Stripe;
 using System;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,30 +53,46 @@ builder.Services.AddScoped<ReferralRepo>();
 //    }
 //}
 
-// Generate random JWT key
-var jwtKey = JWTUtilities.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)
+//// Generate random JWT key
+// var jwtKey = JWTUtilities.GenerateRandomKey(256); // Generate a 256-bit key (32 bytes)
 
-// Update program secrets with the generated JWT key
-var configuration = builder.Configuration;
-var jwtSection = configuration.GetSection("Jwt");
-jwtSection["Key"] = jwtKey;
+//// Update program secrets with the generated JWT key
+//var configuration = builder.Configuration;
+//var jwtSection = configuration.GetSection("Jwt");
+//jwtSection["Key"] = jwtKey;
 
 // Load JWT issuer from configuration
+var configuration = builder.Configuration;
+var jwtSection = configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection["Issuer"];
 
-builder.Services.AddAuthentication("JwtBearer")
-    .AddJwtBearer("JwtBearer", options =>
+//builder.Services.AddAuthentication("JwtBearer")
+//    .AddJwtBearer("JwtBearer", options =>
+//    {
+//        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+//        {
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(jwtKey)),
+//            ValidateIssuer = true,
+//            ValidIssuer = jwtIssuer,
+//            ValidateAudience = true,
+//            ValidAudience = jwtIssuer,
+//            ValidateLifetime = true,
+//            ClockSkew = TimeSpan.Zero
+//        };
+//    });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(jwtKey)),
-            ValidateIssuer = true,
-            ValidIssuer = jwtIssuer,
-            ValidateAudience = true,
-            ValidAudience = jwtIssuer,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"])),
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
         };
     });
 
@@ -111,6 +130,17 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod();
         });
 });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowReactApp",
+//        builder =>
+//        {
+//            builder.WithOrigins("http://localhost:5173")
+//                   .AllowAnyHeader()
+//                   .AllowAnyMethod();
+//        });
+//});
 
 // Set Stripe API Key
 StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
