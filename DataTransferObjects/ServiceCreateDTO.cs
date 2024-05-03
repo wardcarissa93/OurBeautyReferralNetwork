@@ -3,7 +3,7 @@ using OurBeautyReferralNetwork.Models;
 
 namespace OurBeautyReferralNetwork.DataTransferObjects
 {
-    public class ServiceDTO
+    public class ServiceCreateDTO
     {
         public int PkServiceId { get; set; }
 
@@ -20,12 +20,5 @@ namespace OurBeautyReferralNetwork.DataTransferObjects
         public int FkCategoryId { get; set; }
 
         public decimal? BasePrice { get; set; }
-
-        // Navigation property to access Discount's properties
-        [BindNever]
-        public virtual Discount? FkDiscount { get; set; }
-
-        // Property to access Discount's Percentage
-        public decimal? DiscountPrice => FkDiscount?.Percentage; // This calculates the discount percentage from the related Discount entity
     }
 }

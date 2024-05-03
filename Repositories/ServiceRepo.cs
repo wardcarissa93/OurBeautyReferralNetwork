@@ -110,21 +110,19 @@ namespace OurBeautyReferralNetwork.Repositories
             return null;
         }
 
-        public Service CreateServiceForBusiness(ServiceDTO serviceDTO)
+        public Service CreateServiceForBusiness(ServiceCreateDTO servicecreateDTO, Discount discount)
         {
-            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
-            Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
             var service = new Service
             {
-                PkServiceId = serviceDTO.PkServiceId,
-                Image = serviceDTO.Image,
-                FkBusinessId = serviceDTO.FkBusinessId,
-                ServiceName = serviceDTO.ServiceName,
-                Description = serviceDTO.Description,
-                FkDiscountId = serviceDTO.FkDiscountId,
-                BasePrice = serviceDTO.BasePrice,
+                PkServiceId = servicecreateDTO.PkServiceId,
+                Image = servicecreateDTO.Image,
+                FkBusinessId = servicecreateDTO.FkBusinessId,
+                ServiceName = servicecreateDTO.ServiceName,
+                Description = servicecreateDTO.Description,
+                FkDiscountId = servicecreateDTO.FkDiscountId,
+                BasePrice = servicecreateDTO.BasePrice,
                 FkDiscount = discount,
-                FkCategoryId = serviceDTO.FkCategoryId,
+                FkCategoryId = servicecreateDTO.FkCategoryId,
             };
             try
             {
