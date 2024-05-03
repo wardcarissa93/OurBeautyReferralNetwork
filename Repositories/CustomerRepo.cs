@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OurBeautyReferralNetwork.CustomerModels;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Utilities;
 
@@ -76,7 +76,7 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
-        public async Task<IActionResult> AddCustomer(RegisterCustomer customer)
+        public async Task<IActionResult> AddCustomer(RegisterCustomerDTO customer)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace OurBeautyReferralNetwork.Repositories
             return new BadRequestObjectResult(new { Message = "Invalid email or password" });
         }
 
-        public async Task<IActionResult> EditCustomer(EditCustomer customer)
+        public async Task<IActionResult> EditCustomer(EditCustomerDTO customer)
         {
             try
             {
@@ -194,7 +194,7 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
-        public async Task<IActionResult> UpdatePassword(EditPassword password)
+        public async Task<IActionResult> UpdatePassword(EditPasswordDTO password)
         {
             try
             {

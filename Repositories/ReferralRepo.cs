@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 
 namespace OurBeautyReferralNetwork.Repositories
@@ -108,6 +109,36 @@ namespace OurBeautyReferralNetwork.Repositories
             catch (Exception ex)
             {
                 return new BadRequestObjectResult($"Error creating referral: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> EditReferral(ReferralDTO referralDTO)
+        {
+            try
+            {
+                // Check if the referral code exists in the database
+                var existingReferral = await _obrnContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralDTO.PkReferralId);
+                if (existingReferral == null)
+                {
+                    return new NotFoundObjectResult("Referral code not found");
+                }
+
+                // Update the referral's properties
+                existingReferral.FkReferrerCustomerId = referralDTO.FkReferrerCustomerId;
+                existingReferral.FkReferredCustomerId = referralDTO.FkReferredCustomerId;
+                existingReferral.FkReferrerBusinessId = referralDTO.FkReferrerBusinessId;
+                existingReferral.FkReferredBusinessId = referralDTO.FkReferredBusinessId;
+                existingReferral.ReferralDate = DateOnly.FromDateTime(DateTime.Today);
+                existingReferral.Status = "fulfilled";
+
+                // Save changes to the database
+                await _obrnContext.SaveChangesAsync();
+
+                return new OkObjectResult("Referral completed successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult($"Error completing referral: {ex.Message}");
             }
         }
     }

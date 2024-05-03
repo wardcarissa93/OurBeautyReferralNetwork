@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
@@ -45,6 +46,13 @@ namespace OurBeautyReferralNetwork.Controllers
         public async Task<IActionResult> CreateReferralCodeForBusiness(string businessId)
         {
             var result = await _referralRepo.CreateReferralCodeForBusiness(businessId);
+            return result;
+        }
+
+        [HttpPost("edit-referral")]
+        public async Task<IActionResult> EditReferral(ReferralDTO referralDTO)
+        {
+            var result = await _referralRepo.EditReferral(referralDTO);
             return result;
         }
     }

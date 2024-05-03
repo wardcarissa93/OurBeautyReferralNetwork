@@ -1,6 +1,6 @@
-﻿namespace OurBeautyReferralNetwork.BusinessModels;
+﻿namespace OurBeautyReferralNetwork.DataTransferObjects;
 
-public partial class RegisterBusiness
+public partial class RegisterBusinessDTO
 {
     public string PkBusinessId { get; set; } = null!;
     public string BusinessName { get; set; } = null!;
