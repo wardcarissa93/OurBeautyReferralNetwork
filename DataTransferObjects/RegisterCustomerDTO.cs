@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OurBeautyReferralNetwork.CustomerModels;
+namespace OurBeautyReferralNetwork.DataTransferObjects;
 
-public partial class RegisterCustomer
+public partial class RegisterCustomerDTO
 {
     public string PkCustomerId { get; set; } = null!;
 

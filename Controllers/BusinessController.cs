@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OurBeautyReferralNetwork.BusinessModels;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
@@ -40,14 +40,14 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPost("addbusiness")]
-        public async Task<IActionResult> AddBusiness(RegisterBusiness model)
+        public async Task<IActionResult> AddBusiness(RegisterBusinessDTO model)
         {
             var result = await _businessRepo.AddBusiness(model);
             return result;
         }
 
         [HttpPost("editbusiness")]
-        public async Task<IActionResult> EditBusiness(EditBusiness business)
+        public async Task<IActionResult> EditBusiness(EditBusinessDTO business)
         {
             var result = await _businessRepo.EditBusiness(business);
             return result;

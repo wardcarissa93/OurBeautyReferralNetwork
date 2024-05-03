@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using OurBeautyReferralNetwork.CustomerModels;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 using OurBeautyReferralNetwork.Utilities;
@@ -51,7 +51,7 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPost("addcustomer")]
-        public async Task<IActionResult> AddCustomer(RegisterCustomer model)
+        public async Task<IActionResult> AddCustomer(RegisterCustomerDTO model)
         {
             var result = await _customerRepo.AddCustomer(model);
             return result;
@@ -65,14 +65,14 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPost("editcustomer")]
-        public async Task<IActionResult> EditCustomer(EditCustomer customer)
+        public async Task<IActionResult> EditCustomer(EditCustomerDTO customer)
         {
             var result = await _customerRepo.EditCustomer(customer);
             return result;
         }
 
         [HttpPost("updatepassword")]
-        public async Task<IActionResult> UpdatePassword(EditPassword password)
+        public async Task<IActionResult> UpdatePassword(EditPasswordDTO password)
         {
             var result = await _customerRepo.UpdatePassword(password);
             return result;
