@@ -40,7 +40,7 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                var customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customerId);
+                Customer customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customerId);
                 if (customer != null)
                 {
                     return new OkObjectResult(customer);
@@ -60,7 +60,7 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                var customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.Email == email);
+                Customer customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.Email == email);
                 if (customer != null)
                 {
                     return new OkObjectResult(customer);
@@ -82,13 +82,13 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 using (var dbContext = new obrnDbContext())
                 {
-                    var existingCustomer = await dbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
+                    Customer existingCustomer = await dbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
                     if (existingCustomer != null)
                     {
                         return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
                     }
 
-                    var newCustomer = new Customer
+                    Customer newCustomer = new Customer
                     {
                         PkCustomerId = customer.PkCustomerId,
                         FirstName = customer.FirstName,
@@ -213,7 +213,7 @@ namespace OurBeautyReferralNetwork.Repositories
             try
             {
                 // Check if the customer exists in the database
-                var existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
+                Customer existingCustomer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
                 if (existingCustomer == null)
                 {
                     return new NotFoundObjectResult("Customer not found");
@@ -228,7 +228,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 existingCustomer.PostalCode = customer.PostalCode;
                 existingCustomer.Phone = customer.Phone;
                 existingCustomer.Birthdate = customer.Birthdate;
-                existingCustomer.Email = customer.Email;
+                //existingCustomer.Email = customer.Email;
                 existingCustomer.Vip = customer.Vip;
 
                 // Save changes to the database
@@ -287,7 +287,7 @@ namespace OurBeautyReferralNetwork.Repositories
             try
             {
                 // Find the customer by ID
-                var customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customerId);
+                Customer customer = await _obrnDbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customerId);
                 if (customer == null)
                 {
                     return new NotFoundObjectResult("Customer not found");
