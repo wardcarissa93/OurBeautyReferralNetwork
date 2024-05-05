@@ -16,14 +16,14 @@ namespace OurBeautyReferralNetwork.Controllers
             _roleRepo = roleRepo;
         }
 
-        [HttpGet("getroles")]
+        [HttpGet("get-roles")]
         public ActionResult<IEnumerable<AspNetRole>> GetRoles()
         {
             var roles = _roleRepo.GetAllRoles();
             return Ok(roles);
         }
 
-        [HttpPost("addrole")]
+        [HttpPost("add-role")]
         public async Task<IActionResult> AddRole(string roleName)
         {
             var result = await _roleRepo.AddRole(roleName);

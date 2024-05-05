@@ -21,14 +21,14 @@ namespace OurBeautyReferralNetwork.Controllers
             _obrnDbContext = obrnDbContext;
         }
 
-        [HttpGet("getreferrals")]
+        [HttpGet("get-referrals")]
         public ActionResult<IEnumerable<Referral>> GetReferrals()
         {
             var referrals = _referralRepo.GetAllReferrals();
             return Ok(referrals);
         }
 
-        [HttpGet("getreferral/{id}")]
+        [HttpGet("get-referral/{id}")]
         public async Task<IActionResult> GetReferralById(string id)
         {
             var result = await _referralRepo.GetReferralById(id);
@@ -42,14 +42,14 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpPost("createreferralcustomer")]
+        [HttpPost("create-referral-customer")]
         public async Task<IActionResult> CreateReferralCodeForCustomer(ReferralDTO referralDTO)
         {
             var result = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
             return result;
         }
 
-        [HttpPost("createreferralbusiness")]
+        [HttpPost("create-referral-business")]
         public async Task<IActionResult> CreateReferralCodeForBusiness(ReferralDTO referralDTO)
         {
             var result = await _referralRepo.CreateReferralCodeForBusiness(referralDTO);

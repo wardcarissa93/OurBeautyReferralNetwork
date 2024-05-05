@@ -50,7 +50,7 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpPost("addcustomer")]
+        [HttpPost("add-customer")]
         public async Task<IActionResult> AddCustomer(RegisterCustomerDTO model)
         {
             var result = await _customerRepo.AddCustomer(model);
@@ -64,21 +64,21 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpPost("editcustomer")]
+        [HttpPost("edit-customer")]
         public async Task<IActionResult> EditCustomer(EditCustomerDTO customer)
         {
             var result = await _customerRepo.EditCustomer(customer);
             return result;
         }
 
-        [HttpPost("updatepassword")]
+        [HttpPost("update-password")]
         public async Task<IActionResult> UpdatePassword(EditPasswordDTO password)
         {
             var result = await _customerRepo.UpdatePassword(password);
             return result;
         }
 
-        [HttpDelete("deletecustomer/{id}")]
+        [HttpDelete("delete-customer/{id}")]
         public async Task<IActionResult> DeleteCustomerById(string id)
         {
             var result = await _customerRepo.DeleteCustomer(id);
