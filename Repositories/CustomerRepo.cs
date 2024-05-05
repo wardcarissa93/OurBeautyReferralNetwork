@@ -17,18 +17,21 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ReferralRepo _referralRepo;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserRepo _userRepo;
 
         public CustomerRepo(JWTUtilities jwtUtilities,
                             obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
                             ReferralRepo referralRepo,
-                            SignInManager<IdentityUser> signInManager)
+                            SignInManager<IdentityUser> signInManager,
+                            UserRepo userRepo)
         {
             _jwtUtilities = jwtUtilities;
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
             _referralRepo = referralRepo;
             _signInManager = signInManager;
+            _userRepo = userRepo;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -201,7 +204,7 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 using (var dbContext = new obrnDbContext())
                 {
-                    if (!IsUsernameAvailable(customer.PkCustomerId))
+                    if (!IsCustomerUsernameAvailable(customer.PkCustomerId))
                     {
                         return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
                     }
@@ -211,7 +214,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     await dbContext.SaveChangesAsync();
                     Console.WriteLine("New customer added");
 
-                    var user = await AddNewUser(customer);
+                    var user = await _userRepo.AddNewUser(customer.PkCustomerId, customer.Email, customer.Password, "customer");
 
                     var token = _jwtUtilities.GenerateJwtToken(customer.Email);
 
@@ -227,7 +230,7 @@ namespace OurBeautyReferralNetwork.Repositories
             }
             catch (Exception ex)
             {
-                return HandleException(ex);
+                return new BadRequestObjectResult($"Error adding customer: {ex.Message}");
             }
         }
 
@@ -358,7 +361,7 @@ namespace OurBeautyReferralNetwork.Repositories
         }
 
 
-        private bool IsUsernameAvailable(string username)
+        private bool IsCustomerUsernameAvailable(string username)
         {
             Customer existingCustomer = _obrnDbContext.Customers.FirstOrDefault(c => c.PkCustomerId == username);
             return existingCustomer == null;
@@ -377,25 +380,6 @@ namespace OurBeautyReferralNetwork.Repositories
                 Vip = customer.Vip,
                 Confirm18 = customer.Confirm18
             };
-        }
-
-        private async Task<IdentityUser> AddNewUser(RegisterCustomerDTO customer)
-        {
-            var user = new IdentityUser
-            {
-                UserName = customer.PkCustomerId,
-                Email = customer.Email,
-            };
-
-            var addUserResult = await _userManager.CreateAsync(user, customer.Password);
-
-            if (addUserResult.Succeeded)
-            {
-                Console.WriteLine("New user added");
-                await _userManager.AddToRoleAsync(user, "customer");
-            }
-
-            return user;
         }
 
         private async Task<IActionResult> HandleCustomerReferral(RegisterCustomerDTO customer, IdentityUser user)
@@ -469,12 +453,6 @@ namespace OurBeautyReferralNetwork.Repositories
                 return new OkObjectResult(new { Message = "Referral completed successfully", ReferralId = referralOkResult.Value });
             }
             return referralResult;
-        }
-
-        private IActionResult HandleException(Exception ex)
-        {
-            Console.WriteLine($"Error adding customer: {ex.Message}");
-            return new BadRequestObjectResult($"Error adding customer: {ex.Message}");
         }
     }
 }

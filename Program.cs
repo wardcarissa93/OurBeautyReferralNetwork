@@ -35,6 +35,7 @@ builder.Services.AddScoped<RoleRepo>();
 builder.Services.AddScoped<UserRoleRepo>();
 builder.Services.AddScoped<JWTUtilities>();
 builder.Services.AddScoped<ReferralRepo>();
+builder.Services.AddScoped<UserRepo>();
 
 // Best practice is to scope the NpgsqlConnection to a "using" block
 //using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
