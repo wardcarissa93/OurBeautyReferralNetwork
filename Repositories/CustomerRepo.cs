@@ -11,19 +11,19 @@ namespace OurBeautyReferralNetwork.Repositories
 {
     public class CustomerRepo
     {
-        private readonly JWTUtilities _jWTUtilities;
+        private readonly JWTUtilities _jwtUtilities;
         private readonly obrnDbContext _obrnDbContext;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ReferralRepo _referralRepo;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public CustomerRepo(JWTUtilities jWTUtilities,
+        public CustomerRepo(JWTUtilities jwtUtilities,
                             obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
                             ReferralRepo referralRepo,
                             SignInManager<IdentityUser> signInManager)
         {
-            _jWTUtilities = jWTUtilities;
+            _jwtUtilities = jwtUtilities;
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
             _referralRepo = referralRepo;
@@ -120,18 +120,66 @@ namespace OurBeautyReferralNetwork.Repositories
                         if (addUserRoleResult.Succeeded)
                         {
                             Console.WriteLine("Customer role added to new user");
-                            var token = _jWTUtilities.GenerateJwtToken(customer.Email);
-                            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(customer.PkCustomerId);
+                            var token = _jwtUtilities.GenerateJwtToken(customer.Email);
 
-                            if (referralResult is OkObjectResult referralOkResult)
+                            if (customer.FkReferralId != null)
                             {
-                                Console.WriteLine("Referral code created");
-                                await _signInManager.SignInAsync(user, isPersistent: false);
-                                Console.WriteLine("User logged in");
-                                return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
-                            }
+                                var referralType = await _referralRepo.GetReferralTypeById(customer.FkReferralId);
+                                if (referralType.ToString() == "C")
+                                {
+                                    var referrerCustomerId = await _referralRepo.GetFkReferredCustomerId(customer.FkReferralId);
+                                    ReferralDTO referralDTO = new ReferralDTO
+                                    {
+                                        FkReferrerCustomerId = referrerCustomerId.ToString(),
+                                        FkReferredCustomerId = customer.PkCustomerId
+                                    };
 
-                            return referralResult;
+                                    var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+                                    if (referralResult is OkObjectResult referralOkResult)
+                                    {
+                                        Console.WriteLine("Referral code created");
+                                        await _signInManager.SignInAsync(user, isPersistent: false);
+                                        Console.WriteLine("User logged in");
+                                        return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
+                                    }
+                                    return referralResult;
+                                }
+                                else if (referralType.ToString() == "B")
+                                {
+                                    var referrerBusinessId = await _referralRepo.GetFkReferredBusinessId(customer.FkReferralId);
+                                    ReferralDTO referralDTO = new ReferralDTO
+                                    {
+                                        FkReferrerBusinessId = referrerBusinessId.ToString(),
+                                        FkReferredCustomerId = customer.PkCustomerId,
+                                    };
+
+                                    var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+                                    if (referralResult is OkObjectResult referralOkResult)
+                                    {
+                                        Console.WriteLine("Referral code created");
+                                        await _signInManager.SignInAsync(user, isPersistent: false);
+                                        Console.WriteLine("User logged in");
+                                        return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
+                                    }
+                                    return referralResult;
+                                }
+                            } 
+                            else
+                            {
+                                ReferralDTO referralDTO = new ReferralDTO
+                                {
+                                    FkReferredCustomerId = customer.PkCustomerId
+                                };
+                                var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+                                if (referralResult is OkObjectResult referralOkResult)
+                                {
+                                    Console.WriteLine("Referral code created");
+                                    await _signInManager.SignInAsync(user, isPersistent: false);
+                                    Console.WriteLine("User logged in");
+                                    return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
+                                }
+                                return referralResult;
+                            }
                         }
 
                         return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
@@ -152,7 +200,7 @@ namespace OurBeautyReferralNetwork.Repositories
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 // Login successful, generate JWT token
-                var token = _jWTUtilities.GenerateJwtToken(user.Email);
+                var token = _jwtUtilities.GenerateJwtToken(user.Email);
 
                 return new OkObjectResult(new { Message = "Login successful", Token = token });
             }

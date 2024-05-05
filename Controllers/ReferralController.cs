@@ -35,10 +35,17 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpPost("createreferralcustomer")]
-        public async Task<IActionResult> CreateReferralCodeForCustomer(string customerId)
+        [HttpGet("get-referral-type/{id}")]
+        public async Task<string> GetReferralTypeById(string id)
         {
-            var result = await _referralRepo.CreateReferralCodeForCustomer(customerId);
+            var result = await _referralRepo.GetReferralTypeById(id);
+            return result;
+        }
+
+        [HttpPost("createreferralcustomer")]
+        public async Task<IActionResult> CreateReferralCodeForCustomer(ReferralDTO referralDTO)
+        {
+            var result = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
             return result;
         }
 
@@ -49,11 +56,11 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpPost("edit-referral")]
-        public async Task<IActionResult> EditReferral(ReferralDTO referralDTO)
-        {
-            var result = await _referralRepo.EditReferral(referralDTO);
-            return result;
-        }
+        //[HttpPost("edit-referral")]
+        //public async Task<IActionResult> EditReferral(ReferralDTO referralDTO)
+        //{
+        //    var result = await _referralRepo.EditReferral(referralDTO);
+        //    return result;
+        //}
     }
 }
