@@ -13,16 +13,19 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly UserManager<IdentityUser> _userManager;
         private readonly JWTUtilities _jwtUtilities;
         private readonly ReferralRepo _referralRepo;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
         public BusinessRepo(obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
                             JWTUtilities jWTUtilities,
-                            ReferralRepo referralRepo)
+                            ReferralRepo referralRepo,
+                            SignInManager<IdentityUser> signInManager)
         {
             _obrnDbContext = obrnDbContext;
             _userManager = userManager;
             _jwtUtilities = jWTUtilities;
             _referralRepo = referralRepo;
+            _signInManager = signInManager;
         }
 
         public IEnumerable<Business> GetAllBusinesses()
@@ -35,7 +38,7 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                var business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(c => c.PkBusinessId == businessId);
+                Business business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(c => c.PkBusinessId == businessId);
                 if (business != null)
                 {
                     return new OkObjectResult(business);
@@ -55,7 +58,7 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                var business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(b => b.Email == email);
+                Business business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(b => b.Email == email);
                 if (business != null)
                 {
                     return new OkObjectResult(business);
@@ -75,63 +78,123 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             try
             {
-                Business newBusiness = new Business
+                using (var dbContext = new obrnDbContext())
                 {
-                    PkBusinessId = business.PkBusinessId,
-                    BusinessName = business.BusinessName,
-                    Logo = business.Logo,
-                    ContactName = business.ContactName,
-                    Address = business.Address,
-                    City = business.City,
-                    Province = business.Province,
-                    PostalCode = business.PostalCode,
-                    Email = business.Email,
-                    Phone = business.Phone,
-                    InsuranceCompany = business.InsuranceCompany,
-                    InsuranceExpiryDate = business.InsuranceExpiryDate,
-                    RegistrationDate = DateOnly.FromDateTime(DateTime.Today),
-                    CommissionPaid = false,
-                    VerificationDocument = business.VerificationDocument,
-                    IsVerified = false,
-                };
-
-                _obrnDbContext.Businesses.Add(newBusiness);
-                await _obrnDbContext.SaveChangesAsync();
-
-                var user = new IdentityUser
-                {
-                    UserName = business.PkBusinessId,
-                    Email = business.Email
-                };
-
-                var addUserResult = await _userManager.CreateAsync(user, business.Password);
-
-                if (addUserResult.Succeeded)
-                {
-                    var addUserRoleResult = await _userManager.AddToRoleAsync(user, "business");
-                    if (addUserRoleResult.Succeeded)
+                    Business existingBusiness = await dbContext.Businesses.FirstOrDefaultAsync(b => b.PkBusinessId == business.PkBusinessId);
+                    if (existingBusiness != null)
                     {
-                        // Generate JWT for the added business
-                        var token = _jwtUtilities.GenerateJwtToken(business.Email);
-
-                        // Create a referral code for the business
-                        var referralResult = await _referralRepo.CreateReferralCodeForBusiness(business.PkBusinessId);
-                        if (referralResult is OkObjectResult referralOkResult)
-                        {
-                            return new OkObjectResult(new { Message = "Business added successfully", Token = token, ReferralId = referralOkResult.Value });
-                        }
-
-                        return referralResult;
+                        return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
                     }
 
-                    return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
-                }
+                    Business newBusiness = new Business
+                    {
+                        PkBusinessId = business.PkBusinessId,
+                        BusinessName = business.BusinessName,
+                        Logo = business.Logo,
+                        ContactName = business.ContactName,
+                        Address = business.Address,
+                        City = business.City,
+                        Province = business.Province,
+                        PostalCode = business.PostalCode,
+                        Email = business.Email,
+                        Phone = business.Phone,
+                        InsuranceCompany = business.InsuranceCompany,
+                        InsuranceExpiryDate = business.InsuranceExpiryDate,
+                        RegistrationDate = DateOnly.FromDateTime(DateTime.Today),
+                        CommissionPaid = false,
+                        VerificationDocument = business.VerificationDocument,
+                        IsVerified = false
+                    };
 
-                return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
+                    dbContext.Businesses.Add(newBusiness);
+                    await dbContext.SaveChangesAsync();
+                    Console.WriteLine("New business added");
+
+                    var user = new IdentityUser
+                    {
+                        UserName = business.PkBusinessId,
+                        Email = business.Email
+                    };
+
+                    var addUserResult = await _userManager.CreateAsync(user, business.Password);
+
+                    if (addUserResult.Succeeded)
+                    {
+                        Console.WriteLine("New user added");
+                        var addUserRoleResult = await _userManager.AddToRoleAsync(user, "business");
+
+                        if (addUserRoleResult.Succeeded)
+                        {
+                            Console.WriteLine("Business role added to new user");
+                            var token = _jwtUtilities.GenerateJwtToken(business.Email);
+
+                            if (business.FkReferralId != null)
+                            {
+                                var referralType = await _referralRepo.GetReferralTypeById(business.FkReferralId);
+                                if (referralType.ToString() == "C")
+                                {
+                                    var referrerCustomerId = await _referralRepo.GetFkReferredCustomerId(business.FkReferralId);
+                                    ReferralDTO referralDTO = new ReferralDTO
+                                    {
+                                        FkReferrerCustomerId = referrerCustomerId.ToString(),
+                                        FkReferredBusinessId = business.PkBusinessId
+                                    };
+
+                                    var referralResult = await _referralRepo.CreateReferralCodeForBusiness(referralDTO);
+                                    if (referralResult is OkObjectResult referralOkResult)
+                                    {
+                                        Console.WriteLine("Referral code created");
+                                        await _signInManager.SignInAsync(user, isPersistent: false);
+                                        Console.WriteLine("User logged in");
+                                        return new OkObjectResult(new { Message = "Business added successfully", Token = token, ReferralId = referralOkResult.Value });
+                                    }
+                                    return referralResult;
+                                }
+                                else if (referralType.ToString() == "B")
+                                {
+                                    var referrerBusinessId = await _referralRepo.GetFkReferredBusinessId(business.FkReferralId);
+                                    ReferralDTO referralDTO = new ReferralDTO
+                                    {
+                                        FkReferrerBusinessId = referrerBusinessId.ToString(),
+                                        FkReferredBusinessId = business.PkBusinessId,
+                                    };
+
+                                    var referralResult = await _referralRepo.CreateReferralCodeForBusiness(referralDTO);
+                                    if (referralResult is OkObjectResult referralOkResult)
+                                    {
+                                        Console.WriteLine("Referral code created");
+                                        await _signInManager.SignInAsync(user, isPersistent: false);
+                                        Console.WriteLine("User logged in");
+                                        return new OkObjectResult(new { Message = "Business added successfully", Token = token, ReferralId = referralOkResult.Value });
+                                    }
+                                    return referralResult;
+                                }
+                            }
+                            else
+                            {
+                                ReferralDTO referralDTO = new ReferralDTO
+                                {
+                                    FkReferredBusinessId = business.PkBusinessId
+                                };
+                                var referralResult = await _referralRepo.CreateReferralCodeForBusiness(referralDTO);
+                                if (referralResult is OkObjectResult referralOkResult)
+                                {
+                                    Console.WriteLine("Referral code created");
+                                    await _signInManager.SignInAsync(user, isPersistent: false);
+                                    Console.WriteLine("User logged in");
+                                    return new OkObjectResult(new { Message = "Business added successfully", Token = token, ReferralId = referralOkResult.Value });
+                                }
+                                return referralResult;
+                            }
+                        }
+                        return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
+                    }
+                    return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
+                }
             }
             catch (Exception ex)
             {
-                return new BadRequestObjectResult($"Error adding business: {ex.Message}");
+                return new BadRequestObjectResult($"Error adding customer: {ex.Message}");
             }
         }
 
@@ -140,7 +203,7 @@ namespace OurBeautyReferralNetwork.Repositories
             try
             {
                 // Check if the business exists in the database
-                var existingBusiness = await _obrnDbContext.Businesses.FirstOrDefaultAsync(b => b.Email == business.Email);
+                Business existingBusiness = await _obrnDbContext.Businesses.FirstOrDefaultAsync(b => b.Email == business.Email);
                 if (existingBusiness == null)
                 {
                     return new NotFoundObjectResult("Business not found");
@@ -176,7 +239,7 @@ namespace OurBeautyReferralNetwork.Repositories
             try
             {
                 // Find the business by ID
-                var business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(c => c.PkBusinessId == businessId);
+                Business business = await _obrnDbContext.Businesses.FirstOrDefaultAsync(c => c.PkBusinessId == businessId);
                 if (business == null)
                 {
                     return new NotFoundObjectResult("Business not found");

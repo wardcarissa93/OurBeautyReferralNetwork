@@ -104,7 +104,7 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
-        public async Task<IActionResult> CreateReferralCodeForBusiness(string businessId)
+        public async Task<IActionResult> CreateReferralCodeForBusiness(ReferralDTO referralDTO)
         {
             try
             {
@@ -121,9 +121,12 @@ namespace OurBeautyReferralNetwork.Repositories
                 Referral newReferral = new Referral
                 {
                     PkReferralId = referralId,
-                    FkReferrerBusinessId = businessId,
+                    FkReferredCustomerId = referralDTO.FkReferredCustomerId ?? null,
+                    FkReferrerCustomerId = referralDTO.FkReferrerCustomerId ?? null,
+                    FkReferredBusinessId = referralDTO.FkReferredBusinessId ?? null,
+                    FkReferrerBusinessId = referralDTO.FkReferrerBusinessId ?? null,
                     ReferralDate = DateOnly.FromDateTime(DateTime.Today),
-                    Status = "pending",
+                    Status = "",
                     ReferredType = "B"
                 };
 

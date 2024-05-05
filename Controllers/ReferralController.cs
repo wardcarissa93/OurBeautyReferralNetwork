@@ -50,9 +50,9 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPost("createreferralbusiness")]
-        public async Task<IActionResult> CreateReferralCodeForBusiness(string businessId)
+        public async Task<IActionResult> CreateReferralCodeForBusiness(ReferralDTO referralDTO)
         {
-            var result = await _referralRepo.CreateReferralCodeForBusiness(businessId);
+            var result = await _referralRepo.CreateReferralCodeForBusiness(referralDTO);
             return result;
         }
 
