@@ -42,6 +42,13 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
+        [HttpGet("get-customer-referral-code/{id}")]
+        public async Task<string> GetCustomerReferralCode(string id)
+        {
+            var result = await _referralRepo.GetCustomerReferralCode(id);
+            return result;
+        }
+
         [HttpPost("create-referral-customer")]
         public async Task<IActionResult> CreateReferralCodeForCustomer(ReferralDTO referralDTO)
         {
