@@ -54,7 +54,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new NotFoundObjectResult("Customer not found");
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return new BadRequestObjectResult($"Error getting customer: {ex.Message}");
             }
@@ -218,12 +218,12 @@ namespace OurBeautyReferralNetwork.Repositories
 
                     var token = _jwtUtilities.GenerateJwtToken(customer.Email);
 
-                     var referralResult = await HandleCustomerReferral(customer, user);
+                    var referralResult = await HandleCustomerReferral(customer, user);
                     if (referralResult is OkObjectResult referralOkResult)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         Console.WriteLine("User logged in");
-                        return new OkObjectResult(new { Message = "Customer added successfully" , Token = token, ReferralId = referralOkResult.Value });
+                        return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
                     }
                     return referralResult;
                 }
@@ -340,6 +340,17 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new NotFoundObjectResult("User not found");
                 }
 
+                // Find and delete the customer's referral code
+                Referral referralCode = await _obrnDbContext.Referrals.FirstOrDefaultAsync(r => r.FkReferredCustomerId == customerId);
+                _obrnDbContext.Referrals.Remove(referralCode);
+
+                // Find and delete any referrals made by this customer
+                var referrals = _obrnDbContext.Referrals.Where(r => r.FkReferredCustomerId == customerId);
+                if (referrals.Any())
+                {
+                    _obrnDbContext.Referrals.RemoveRange(referrals);
+                }
+
                 // Delete the customer
                 _obrnDbContext.Customers.Remove(customer);
                 await _obrnDbContext.SaveChangesAsync();
@@ -352,7 +363,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new BadRequestObjectResult("Error deleting user");
                 }
 
-                return new OkObjectResult("Customer and associated user deleted successfully");
+                return new OkObjectResult("Customer and associated user and referrals deleted successfully");
             }
             catch (Exception ex)
             {
