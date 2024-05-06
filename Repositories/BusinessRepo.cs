@@ -291,6 +291,17 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new NotFoundObjectResult("User not found");
                 }
 
+                // Find and delete the business's referral code
+                Referral referralCode = await _obrnDbContext.Referrals.FirstOrDefaultAsync(r => r.FkReferredBusinessId == businessId);
+                _obrnDbContext.Referrals.Remove(referralCode);
+
+                // Find and delete any referrals made by this business
+                var referrals = _obrnDbContext.Referrals.Where(r => r.FkReferredBusinessId != businessId);
+                if (referrals.Any())
+                {
+                    _obrnDbContext.Referrals.RemoveRange(referrals);
+                }
+
                 // Delete the business
                 _obrnDbContext.Businesses.Remove(business);
                 await _obrnDbContext.SaveChangesAsync();
