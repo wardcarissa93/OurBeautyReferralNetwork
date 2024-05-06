@@ -9,11 +9,11 @@ public partial class FeeAndCommission
 
     public decimal? Amount { get; set; }
 
-    public string Description { get; set; } = null!;
-
     public string Title { get; set; } = null!;
 
-    public decimal? Percentage { get; set; }
+    public string Description { get; set; } = null!;
+
+    public decimal? Percent { get; set; }
 
     public string FeeType { get; set; } = null!;
 

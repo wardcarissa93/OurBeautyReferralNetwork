@@ -49,5 +49,9 @@ public partial class Business
 
     public virtual ICollection<Service> Services { get; set; } = new List<Service>();
 
+    public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+
     public virtual ICollection<Testimonial> Testimonials { get; set; } = new List<Testimonial>();
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

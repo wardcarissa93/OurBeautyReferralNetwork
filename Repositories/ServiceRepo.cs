@@ -1,4 +1,7 @@
-﻿using OurBeautyReferralNetwork.Data;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.EntityExtensions;
 using OurBeautyReferralNetwork.Models;
@@ -11,10 +14,12 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly ApplicationDbContext _context;
         private readonly obrnDbContext _obrnContext;
 
+
         public ServiceRepo(ApplicationDbContext context, obrnDbContext obrnContext)
         {
             _context = context;
             _obrnContext = obrnContext;
+
         }
 
         public IEnumerable<Service> GetAllServicesBase()
@@ -148,22 +153,24 @@ namespace OurBeautyReferralNetwork.Repositories
                 return null;
             }
         }
-        public bool EditServiceForBusiness(ServiceDTO serviceDTO, int serviceId)
+        public bool EditServiceForBusiness(ServiceCreateDTO serviceCreateDTO, int serviceId)
         {
             DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
-            Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
+            Discount discount = discountRepo.GetDiscountById(serviceCreateDTO.FkDiscountId);
+            CategoryRepo categoryRepo = new CategoryRepo(_context, _obrnContext);
+            Category category = categoryRepo.GetCategoryById(serviceCreateDTO.FkCategoryId);
             Service service = GetServiceById(serviceId);
             if (service != null)
             {
-                service.Image = serviceDTO.Image;
-                service.FkBusinessId = serviceDTO.FkBusinessId;
-                service.ServiceName = serviceDTO.ServiceName;
-                service.Description = serviceDTO.Description;
-                service.FkDiscountId = serviceDTO.FkDiscountId;
-                service.BasePrice = serviceDTO.BasePrice;
+                service.Image = serviceCreateDTO.Image;
+                service.FkBusinessId = serviceCreateDTO.FkBusinessId;
+                service.ServiceName = serviceCreateDTO.ServiceName;
+                service.Description = serviceCreateDTO.Description;
+                service.FkDiscountId = serviceCreateDTO.FkDiscountId;
+                service.BasePrice = serviceCreateDTO.BasePrice;
                 service.FkDiscount = discount;
-                service.FkCategoryId = serviceDTO.FkCategoryId;
-
+                service.FkCategoryId = serviceCreateDTO.FkCategoryId;
+                service.FkCategory = category;
                 try
                 {
                     _obrnContext.SaveChanges();

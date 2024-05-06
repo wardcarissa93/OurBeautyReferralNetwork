@@ -146,6 +146,22 @@ builder.Services.AddCors(options =>
 // Set Stripe API Key
 StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
 
+//var options = new Stripe.Checkout.SessionCreateOptions
+//{
+//    SuccessUrl = "https://example.com/success",
+//    LineItems = new List<Stripe.Checkout.SessionLineItemOptions>
+//    {
+//        new Stripe.Checkout.SessionLineItemOptions
+//        {
+//            Price = "price_1MotwRLkdIwHu7ixYcPLm5uZ",
+//            Quantity = 2,
+//        },
+//    },
+//    Mode = "payment",
+//};
+//var service = new Stripe.Checkout.SessionService();
+//service.Create(options);
+
 
 var app = builder.Build();
 

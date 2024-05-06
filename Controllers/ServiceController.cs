@@ -27,14 +27,18 @@ namespace OurBeautyReferralNetwork.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly BusinessRepo _businessRepo; // Add BusinessRepo as a dependency
+
         public ServiceController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
-                              IConfiguration configuration)
+                              IConfiguration configuration, BusinessRepo businessRepo)
         {
             _obrnContext = obrnContext;
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
+          _businessRepo = businessRepo; // Inject BusinessRepo
+
         }
 
         [HttpGet]
@@ -113,10 +117,10 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPut("{serviceId}")]
-        public IActionResult Update (int serviceId, ServiceDTO serviceDTO)
+        public IActionResult Update (int serviceId, ServiceCreateDTO serviceCreateDTO)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, serviceId);
+            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceCreateDTO, serviceId);
             if (!isSuccess)
             {
                 return NotFound("Service not found with the provided ID.");
