@@ -27,14 +27,18 @@ namespace OurBeautyReferralNetwork.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly BusinessRepo _businessRepo; // Add BusinessRepo as a dependency
+
         public ServiceController(ApplicationDbContext context, obrnDbContext obrnContext,
                               UserManager<IdentityUser> userManager,
-                              IConfiguration configuration)
+                              IConfiguration configuration, BusinessRepo businessRepo)
         {
             _obrnContext = obrnContext;
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
+          _businessRepo = businessRepo; // Inject BusinessRepo
+
         }
 
         [HttpGet]
@@ -42,7 +46,7 @@ namespace OurBeautyReferralNetwork.Controllers
 
         public virtual IActionResult GetServiceById([FromRoute][Required] int serviceId)
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
 
             var service = serviceRepo.GetServiceById(serviceId);
             if (service == null)
@@ -64,7 +68,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [SwaggerOperation("ServiceGetAll")]
         public virtual IActionResult ServiceGetAll()
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
             var services = serviceRepo.GetAllServices();
             return Ok(services);
         }
@@ -75,7 +79,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [SwaggerOperation("GetServicesForBusiness")]
         public virtual IActionResult GetServicesForBusiness(string businessId)
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
             var services = serviceRepo.GetAllServicesOfBusiness(businessId);
             return Ok(services);
         }
@@ -86,7 +90,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [SwaggerOperation("GetServiceForBusiness")]
         public virtual IActionResult GetServiceForBusiness(string businessId, int serviceId)
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
             var services = serviceRepo.GetAllServicesOfBusiness(businessId);
             return Ok(services);
         }
@@ -95,7 +99,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [Route("/service/create")]
         public IActionResult CreateForBusiness(ServiceCreateDTO serviceCreateDTO)
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
             DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
             var discount = discountRepo.GetDiscountById(serviceCreateDTO.FkDiscountId);
             if (discount == null)
@@ -115,8 +119,8 @@ namespace OurBeautyReferralNetwork.Controllers
         [HttpPut("{serviceId}")]
         public IActionResult Update (int serviceId, ServiceDTO serviceDTO)
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, serviceId);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
+            bool isSuccess = serviceRepo.EditServiceForBusinessAsync(serviceDTO, serviceId);
             if (!isSuccess)
             {
                 return NotFound("Service not found with the provided ID.");
@@ -128,7 +132,7 @@ namespace OurBeautyReferralNetwork.Controllers
         [SwaggerOperation("Delete")]
         public IActionResult Delete(int serviceId)
         {
-            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
+            ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext, _businessRepo);
             string message = serviceRepo.Delete(serviceId);
             if (message == "Discount does not exist")
             {

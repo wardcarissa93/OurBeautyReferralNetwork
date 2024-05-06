@@ -1,4 +1,7 @@
-﻿using OurBeautyReferralNetwork.Data;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.EntityExtensions;
 using OurBeautyReferralNetwork.Models;
@@ -10,11 +13,15 @@ namespace OurBeautyReferralNetwork.Repositories
     {
         private readonly ApplicationDbContext _context;
         private readonly obrnDbContext _obrnContext;
+        private readonly BusinessRepo _businessRepo; // Add BusinessRepo as a dependency
 
-        public ServiceRepo(ApplicationDbContext context, obrnDbContext obrnContext)
+
+        public ServiceRepo(ApplicationDbContext context, obrnDbContext obrnContext, BusinessRepo businessRepo)
         {
             _context = context;
             _obrnContext = obrnContext;
+            _businessRepo = businessRepo; // Inject BusinessRepo
+
         }
 
         public IEnumerable<Service> GetAllServicesBase()
@@ -148,10 +155,23 @@ namespace OurBeautyReferralNetwork.Repositories
                 return null;
             }
         }
-        public bool EditServiceForBusiness(ServiceDTO serviceDTO, int serviceId)
+
+        public IActionResult GetBusinessObject(ServiceDTO serviceDTO)
+        {
+            var business = _businessRepo.GetBusinessById(serviceDTO.FkBusinessId);
+            // Check if businessResult is an OkObjectResult
+            if (business != null)
+            {
+                return new OkObjectResult(business);
+            }
+            return new NotFoundObjectResult("Business not found");
+        }
+        public bool EditServiceForBusinessAsync(ServiceDTO serviceDTO, int serviceId)
         {
             DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
             Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
+            CategoryRepo categoryRepo = new CategoryRepo(_context, _obrnContext);
+            Category category = categoryRepo.GetCategoryById(serviceDTO.FkCategoryId);
             Service service = GetServiceById(serviceId);
             if (service != null)
             {
@@ -163,7 +183,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 service.BasePrice = serviceDTO.BasePrice;
                 service.FkDiscount = discount;
                 service.FkCategoryId = serviceDTO.FkCategoryId;
-
+                service.FkCategory = category;
                 try
                 {
                     _obrnContext.SaveChanges();
