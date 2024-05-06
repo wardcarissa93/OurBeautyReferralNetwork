@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using OurBeautyReferralNetwork.CustomerModels;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 using OurBeautyReferralNetwork.Utilities;
@@ -28,29 +29,29 @@ namespace OurBeautyReferralNetwork.Controllers
             _customerRepo = customerRepo;
         }
 
-        [HttpGet("getcustomers")]
+        [HttpGet("get-customers")]
         public ActionResult<IEnumerable<Customer>> GetCustomers()
         {
             var customers = _customerRepo.GetAllCustomers();
             return Ok(customers);
         }
 
-        [HttpGet("getcustomer/{id}")]
+        [HttpGet("get-customer/{id}")]
         public async Task<IActionResult> GetCustomerById(string id)
         {
             var result = await _customerRepo.GetCustomerById(id);
             return result;
         }
 
-        [HttpGet("getcustomerbyemail")]
+        [HttpGet("get-customer-by-email")]
         public async Task<IActionResult> GetCustomerByEmail(string email)
         {
             var result = await _customerRepo.GetCustomerByEmail(email);
             return result;
         }
 
-        [HttpPost("addcustomer")]
-        public async Task<IActionResult> AddCustomer(RegisterCustomer model)
+        [HttpPost("add-customer")]
+        public async Task<IActionResult> AddCustomer(RegisterCustomerDTO model)
         {
             var result = await _customerRepo.AddCustomer(model);
             return result;
@@ -63,21 +64,21 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpPost("editcustomer")]
-        public async Task<IActionResult> EditCustomer(EditCustomer customer)
+        [HttpPost("edit-customer")]
+        public async Task<IActionResult> EditCustomer(EditCustomerDTO customer)
         {
             var result = await _customerRepo.EditCustomer(customer);
             return result;
         }
 
-        [HttpPost("updatepassword")]
-        public async Task<IActionResult> UpdatePassword(EditPassword password)
+        [HttpPost("update-password")]
+        public async Task<IActionResult> UpdatePassword(EditPasswordDTO password)
         {
             var result = await _customerRepo.UpdatePassword(password);
             return result;
         }
 
-        [HttpDelete("deletecustomer/{id}")]
+        [HttpDelete("delete-customer/{id}")]
         public async Task<IActionResult> DeleteCustomerById(string id)
         {
             var result = await _customerRepo.DeleteCustomer(id);

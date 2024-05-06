@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OurBeautyReferralNetwork.BusinessModels;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
@@ -17,42 +18,42 @@ namespace OurBeautyReferralNetwork.Controllers
             _businessRepo = businessRepo;
         }
 
-        [HttpGet("getbusinesses")]
+        [HttpGet("get-businesses")]
         public ActionResult<IEnumerable<Business>> GetBusinesses()
         {
             var businesses = _businessRepo.GetAllBusinesses();
             return Ok(businesses);
         }
 
-        [HttpGet("getbusiness/{id}")]
+        [HttpGet("get-business/{id}")]
         public async Task<IActionResult> GetBusinessById(string id)
         {
             var result = await _businessRepo.GetBusinessById(id);
             return result;
         }
 
-        [HttpGet("getbusinessbyemail")]
+        [HttpGet("get-business-by-email")]
         public async Task<IActionResult> GetBusinessByEmail(string email)
         {
             var result = await _businessRepo.GetBusinessByEmail(email);
             return result;
         }
 
-        [HttpPost("addbusiness")]
-        public async Task<IActionResult> AddBusiness(RegisterBusiness model)
+        [HttpPost("add-business")]
+        public async Task<IActionResult> AddBusiness(RegisterBusinessDTO model)
         {
             var result = await _businessRepo.AddBusiness(model);
             return result;
         }
 
-        [HttpPost("editbusiness")]
-        public async Task<IActionResult> EditBusiness(EditBusiness business)
+        [HttpPost("edit-business")]
+        public async Task<IActionResult> EditBusiness(EditBusinessDTO business)
         {
             var result = await _businessRepo.EditBusiness(business);
             return result;
         }
 
-        [HttpDelete("deletebusiness/{id}")]
+        [HttpDelete("delete-business/{id}")]
         public async Task<IActionResult> DeleteBusiness(string id)
         {
             var result = await _businessRepo.DeleteBusiness(id);

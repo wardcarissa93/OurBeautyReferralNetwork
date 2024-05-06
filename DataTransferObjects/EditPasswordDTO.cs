@@ -1,6 +1,6 @@
-﻿namespace OurBeautyReferralNetwork.CustomerModels
+﻿namespace OurBeautyReferralNetwork.DataTransferObjects
 {
-    public class EditPassword
+    public class EditPasswordDTO
     {
         public string UserId { get; set; } = null!;
         public string CurrentPassword { get; set; } = null!;

@@ -1,6 +1,6 @@
-﻿namespace OurBeautyReferralNetwork.BusinessModels
+﻿namespace OurBeautyReferralNetwork.DataTransferObjects
 {
-    public class EditBusiness
+    public class EditBusinessDTO
     {
         public string ContactName { get; set; } = null!;
         public string BusinessName { get; set; } = null!;

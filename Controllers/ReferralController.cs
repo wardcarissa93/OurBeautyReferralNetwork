@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
@@ -20,32 +21,46 @@ namespace OurBeautyReferralNetwork.Controllers
             _obrnDbContext = obrnDbContext;
         }
 
-        [HttpGet("getreferrals")]
+        [HttpGet("get-referrals")]
         public ActionResult<IEnumerable<Referral>> GetReferrals()
         {
             var referrals = _referralRepo.GetAllReferrals();
             return Ok(referrals);
         }
 
-        [HttpGet("getreferral/{id}")]
+        [HttpGet("get-referral/{id}")]
         public async Task<IActionResult> GetReferralById(string id)
         {
             var result = await _referralRepo.GetReferralById(id);
             return result;
         }
 
-        [HttpPost("createreferralcustomer")]
-        public async Task<IActionResult> CreateReferralCodeForCustomer(string customerId)
+        [HttpGet("get-referral-type/{id}")]
+        public async Task<string> GetReferralTypeById(string id)
         {
-            var result = await _referralRepo.CreateReferralCodeForCustomer(customerId);
+            var result = await _referralRepo.GetReferralTypeById(id);
             return result;
         }
 
-        [HttpPost("createreferralbusiness")]
-        public async Task<IActionResult> CreateReferralCodeForBusiness(string businessId)
+        [HttpPost("create-referral-customer")]
+        public async Task<IActionResult> CreateReferralCodeForCustomer(ReferralDTO referralDTO)
         {
-            var result = await _referralRepo.CreateReferralCodeForBusiness(businessId);
+            var result = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
             return result;
         }
+
+        [HttpPost("create-referral-business")]
+        public async Task<IActionResult> CreateReferralCodeForBusiness(ReferralDTO referralDTO)
+        {
+            var result = await _referralRepo.CreateReferralCodeForBusiness(referralDTO);
+            return result;
+        }
+
+        //[HttpPost("edit-referral")]
+        //public async Task<IActionResult> EditReferral(ReferralDTO referralDTO)
+        //{
+        //    var result = await _referralRepo.EditReferral(referralDTO);
+        //    return result;
+        //}
     }
 }
