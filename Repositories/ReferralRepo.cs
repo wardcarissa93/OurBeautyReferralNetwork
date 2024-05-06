@@ -86,6 +86,27 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
+        public async Task<string> GetBusinessReferralCode(string businessId)
+        {
+            try
+            {
+                obrnDbContext newObrnDbContext = new obrnDbContext();
+                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.FkReferredBusinessId == businessId);
+                if (referral != null)
+                {
+                    return referral.PkReferralId;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Referral not found");
+                }
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception($"Error getting referral code: {ex.Message}");
+            }
+        }
+
         public async Task<string> GetFkReferredCustomerId(string referralId)
         {
             try
