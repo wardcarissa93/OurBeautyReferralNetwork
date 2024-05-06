@@ -49,7 +49,11 @@ public partial class obrnDbContext : DbContext
 
     public virtual DbSet<Service> Services { get; set; }
 
+    public virtual DbSet<Subscription> Subscriptions { get; set; }
+
     public virtual DbSet<Testimonial> Testimonials { get; set; }
+
+    public virtual DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -249,14 +253,14 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.PkFeeId)
                 .HasMaxLength(4)
                 .HasColumnName("pkFeeID");
-            entity.Property(e => e.Description).HasMaxLength(1200);
+            entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.FeeType)
                 .HasMaxLength(12)
                 .IsFixedLength();
             entity.Property(e => e.Frequency)
                 .HasMaxLength(8)
                 .IsFixedLength();
-            entity.Property(e => e.Title).HasMaxLength(255);
+            entity.Property(e => e.Title).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Referral>(entity =>
@@ -379,6 +383,37 @@ public partial class obrnDbContext : DbContext
                 .HasConstraintName("Service_fkDiscountID_fkey");
         });
 
+        modelBuilder.Entity<Subscription>(entity =>
+        {
+            entity.HasKey(e => e.PkSubscriptionId).HasName("Subscription_pkey");
+
+            entity.ToTable("Subscription");
+
+            entity.Property(e => e.PkSubscriptionId).HasColumnName("pkSubscriptionID");
+            entity.Property(e => e.Description).HasMaxLength(1200);
+            entity.Property(e => e.FeeType)
+                .HasMaxLength(12)
+                .IsFixedLength();
+            entity.Property(e => e.FkBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkBusinessID");
+            entity.Property(e => e.FkTransactionId).HasColumnName("fkTransactionID");
+            entity.Property(e => e.Frequency)
+                .HasMaxLength(8)
+                .IsFixedLength();
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.SubscriptionTitle).HasMaxLength(255);
+
+            entity.HasOne(d => d.FkBusiness).WithMany(p => p.Subscriptions)
+                .HasForeignKey(d => d.FkBusinessId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Subscription_fkBusinessID_fkey");
+
+            entity.HasOne(d => d.FkTransaction).WithMany(p => p.Subscriptions)
+                .HasForeignKey(d => d.FkTransactionId)
+                .HasConstraintName("fk_transaction_id");
+        });
+
         modelBuilder.Entity<Testimonial>(entity =>
         {
             entity.HasKey(e => e.PkTestimonialId).HasName("Testimonial_pkey");
@@ -396,6 +431,36 @@ public partial class obrnDbContext : DbContext
                 .HasForeignKey(d => d.FkBusinessId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Testimonial_fkBusinessID_fkey");
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasKey(e => e.PkTransactionId).HasName("Transaction_pkey");
+
+            entity.ToTable("Transaction");
+
+            entity.Property(e => e.PkTransactionId).HasColumnName("pkTransactionID");
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.FkBusinessId)
+                .HasMaxLength(30)
+                .HasColumnName("fkBusinessID");
+            entity.Property(e => e.FkCustomerId)
+                .HasMaxLength(20)
+                .HasColumnName("fkCustomerID");
+            entity.Property(e => e.FkSubscriptionId).HasColumnName("fkSubscriptionID");
+            entity.Property(e => e.TransactionTitle).HasMaxLength(255);
+
+            entity.HasOne(d => d.FkBusiness).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.FkBusinessId)
+                .HasConstraintName("Transaction_fkBusinessID_fkey");
+
+            entity.HasOne(d => d.FkCustomer).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.FkCustomerId)
+                .HasConstraintName("Transaction_fkCustomerID_fkey");
+
+            entity.HasOne(d => d.FkSubscription).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.FkSubscriptionId)
+                .HasConstraintName("fk_subscription_id");
         });
 
         OnModelCreatingPartial(modelBuilder);

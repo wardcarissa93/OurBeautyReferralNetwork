@@ -93,5 +93,27 @@ namespace WebApiDemo.Controllers
             }
         }
 
+        //[HttpPost("cancel-subscription")]
+        //public async Task<IActionResult> CancelSubscription(string userId)
+        //{
+        //    // Retrieve session ID associated with the user (from your database)
+        //    var sessionId = GetSessionIdForUser(userId); // Example method to get sessionId
+
+        //    // Cancel the subscription session using the Stripe API
+        //    var service = new SessionService();
+        //    var canceledSession = await service.CancelAsync(sessionId);
+
+        //    // Handle cancellation result (e.g., update database status)
+        //    if (canceledSession.Status == "canceled")
+        //    {
+        //        // Update user's subscription status in your database
+        //        return Ok("Subscription canceled successfully");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Failed to cancel subscription");
+        //    }
+        //}
+
     }
 }
