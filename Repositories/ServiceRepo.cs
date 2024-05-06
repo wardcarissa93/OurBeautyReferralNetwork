@@ -72,23 +72,29 @@ namespace OurBeautyReferralNetwork.Repositories
         }
 
 
-        public IEnumerable<Service> GetAllServicesOfBusiness(string businessId)
+        public IEnumerable<ServiceDTO> GetAllServicesOfBusiness(string businessId)
         {
-            var services =  _obrnContext.Services
+            var services = _obrnContext.Services
                 .Where(s => s.FkBusinessId == businessId)
                 .ToList();
-
+            // Convert the LINQ query to a list to materialize the results
             var extendedServices = services.Select(service =>
             {
                 decimal? discountPercentage = GetServiceDiscount(service.PkServiceId);
+                Console.WriteLine(discountPercentage);
                 decimal actualDiscount = discountPercentage ?? 0;
+                Console.WriteLine(actualDiscount);
                 DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
                 Discount discount = discountRepo.GetDiscountById(service.FkDiscountId);
-
-                return service.ExtendService(discount);
-            });
-
-            return null;
+                Console.WriteLine(discount.ToString());
+                // Log before extending the service
+                Console.WriteLine($"Extending service ID: {service.PkServiceId} with discount ID: {service.FkDiscountId}");
+                // Call ExtendService and log result
+                var extendedService = service.ExtendService(discount);
+                Console.WriteLine($"Extended service created for service ID: {service.PkServiceId}");
+                return extendedService;
+            }).ToList(); // Materialize the query to a list
+            return extendedServices; // Now you can return the list of extended services
         }
 
         public ServiceDTO GetServiceOfBusiness(string businessId, int serviceId)
@@ -110,21 +116,19 @@ namespace OurBeautyReferralNetwork.Repositories
             return null;
         }
 
-        public Service CreateServiceForBusiness(ServiceDTO serviceDTO)
+        public Service CreateServiceForBusiness(ServiceCreateDTO servicecreateDTO, Discount discount)
         {
-            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
-            Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
             var service = new Service
             {
-                PkServiceId = serviceDTO.PkServiceId,
-                Image = serviceDTO.Image,
-                FkBusinessId = serviceDTO.FkBusinessId,
-                ServiceName = serviceDTO.ServiceName,
-                Description = serviceDTO.Description,
-                FkDiscountId = serviceDTO.FkDiscountId,
-                BasePrice = serviceDTO.BasePrice,
+                PkServiceId = servicecreateDTO.PkServiceId,
+                Image = servicecreateDTO.Image,
+                FkBusinessId = servicecreateDTO.FkBusinessId,
+                ServiceName = servicecreateDTO.ServiceName,
+                Description = servicecreateDTO.Description,
+                FkDiscountId = servicecreateDTO.FkDiscountId,
+                BasePrice = servicecreateDTO.BasePrice,
                 FkDiscount = discount,
-                FkCategoryId = serviceDTO.FkCategoryId,
+                FkCategoryId = servicecreateDTO.FkCategoryId,
             };
             try
             {
@@ -138,24 +142,21 @@ namespace OurBeautyReferralNetwork.Repositories
                 return null;
             }
         }
-
-        public bool EditServiceForBusiness(ServiceDTO serviceDTO, string businessId)
+        public bool EditServiceForBusiness(ServiceDTO serviceDTO, int serviceId)
         {
-            DiscountRepo discountRepo = new DiscountRepo (_context, _obrnContext);
+            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
             Discount discount = discountRepo.GetDiscountById(serviceDTO.FkDiscountId);
-            Service service = GetServiceById(serviceDTO.PkServiceId);
+            Service service = GetServiceById(serviceId);
             if (service != null)
             {
-                service.PkServiceId = serviceDTO.PkServiceId;
                 service.Image = serviceDTO.Image;
-                service.FkBusinessId = businessId;
+                service.FkBusinessId = serviceDTO.FkBusinessId;
                 service.ServiceName = serviceDTO.ServiceName;
                 service.Description = serviceDTO.Description;
                 service.FkDiscountId = serviceDTO.FkDiscountId;
                 service.BasePrice = serviceDTO.BasePrice;
                 service.FkDiscount = discount;
                 service.FkCategoryId = serviceDTO.FkCategoryId;
-
                 try
                 {
                     _obrnContext.SaveChanges();
@@ -170,7 +171,6 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 return false;
             }
-            
         }
 
         public string Delete(int serviceId)

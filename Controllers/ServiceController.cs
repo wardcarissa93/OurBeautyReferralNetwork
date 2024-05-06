@@ -70,7 +70,7 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpGet]
-        [Route("/service/{businessId}")]
+        [Route("/service/business/{businessId}")]
         //[ValidateModelState]
         [SwaggerOperation("GetServicesForBusiness")]
         public virtual IActionResult GetServicesForBusiness(string businessId)
@@ -93,24 +93,28 @@ namespace OurBeautyReferralNetwork.Controllers
 
         [HttpPost]
         [Route("/service/create")]
-        public IActionResult CreateForBusiness(ServiceDTO serviceDTO)
+        public IActionResult CreateForBusiness(ServiceCreateDTO serviceCreateDTO)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            Service createdService = serviceRepo.CreateServiceForBusiness(serviceDTO);
-
+            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+            var discount = discountRepo.GetDiscountById(serviceCreateDTO.FkDiscountId);
+            if (discount == null)
+            {
+                return NotFound("Discount not found"); // Handle the case where discount is not found
+            }
+            Service createdService = serviceRepo.CreateServiceForBusiness(serviceCreateDTO, discount);
             if (createdService != null)
             {
-                return CreatedAtAction(nameof(GetServicesForBusiness), new { serviceId = createdService.PkServiceId }, createdService);
+                return CreatedAtAction(nameof(GetServicesForBusiness), new { businessId = serviceCreateDTO.FkBusinessId }, createdService);
             }
-            return BadRequest();
-
+            return BadRequest("Failed to create the service");
         }
 
         [HttpPut("{serviceId}")]
-        public IActionResult Update (string businessID, ServiceDTO serviceDTO)
+        public IActionResult Update(int serviceId, ServiceDTO serviceDTO)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, businessID);
+            bool isSuccess = serviceRepo.EditServiceForBusiness(serviceDTO, serviceId);
             if (!isSuccess)
             {
                 return NotFound("Service not found with the provided ID.");
