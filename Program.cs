@@ -63,9 +63,9 @@ builder.Services.AddScoped<UserRepo>();
 //jwtSection["Key"] = jwtKey;
 
 // Load JWT issuer from configuration
-var configuration = builder.Configuration;
-var jwtSection = configuration.GetSection("Jwt");
-var jwtIssuer = jwtSection["Issuer"];
+//var configuration = builder.Configuration;
+//var jwtSection = configuration.GetSection("Jwt");
+//var jwtIssuer = jwtSection["Issuer"];
 
 //builder.Services.AddAuthentication("JwtBearer")
 //    .AddJwtBearer("JwtBearer", options =>
@@ -73,7 +73,7 @@ var jwtIssuer = jwtSection["Issuer"];
 //        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
 //        {
 //            ValidateIssuerSigningKey = true,
-//            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(jwtKey)),
+//            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(jwtSection.Key)),
 //            ValidateIssuer = true,
 //            ValidIssuer = jwtIssuer,
 //            ValidateAudience = true,
