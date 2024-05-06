@@ -29,21 +29,21 @@ namespace OurBeautyReferralNetwork.Controllers
             _customerRepo = customerRepo;
         }
 
-        [HttpGet("getcustomers")]
+        [HttpGet("get-customers")]
         public ActionResult<IEnumerable<Customer>> GetCustomers()
         {
             var customers = _customerRepo.GetAllCustomers();
             return Ok(customers);
         }
 
-        [HttpGet("getcustomer/{id}")]
+        [HttpGet("get-customer/{id}")]
         public async Task<IActionResult> GetCustomerById(string id)
         {
             var result = await _customerRepo.GetCustomerById(id);
             return result;
         }
 
-        [HttpGet("getcustomerbyemail")]
+        [HttpGet("get-customer-by-email")]
         public async Task<IActionResult> GetCustomerByEmail(string email)
         {
             var result = await _customerRepo.GetCustomerByEmail(email);
