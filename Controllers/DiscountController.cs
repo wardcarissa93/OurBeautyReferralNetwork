@@ -78,8 +78,8 @@ namespace OurBeautyReferralNetwork.Controllers
         [SwaggerOperation("Delete")]
         public IActionResult Delete(string discountId)
         {
-            FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
-            string message = feeRepo.Delete(discountId);
+            DiscountRepo discountRepo = new DiscountRepo(_context, _obrnContext);
+            string message = discountRepo.Delete(discountId);
             if (message == "Discount does not exist")
             {
                 return NotFound();
