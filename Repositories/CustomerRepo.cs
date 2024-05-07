@@ -18,13 +18,15 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly ReferralRepo _referralRepo;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserRepo _userRepo;
+        private readonly ApplicationDbContext _context;
 
         public CustomerRepo(JWTUtilities jwtUtilities,
                             obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
                             ReferralRepo referralRepo,
                             SignInManager<IdentityUser> signInManager,
-                            UserRepo userRepo)
+                            UserRepo userRepo,
+                            ApplicationDbContext context)
         {
             _jwtUtilities = jwtUtilities;
             _obrnDbContext = obrnDbContext;
@@ -32,6 +34,7 @@ namespace OurBeautyReferralNetwork.Repositories
             _referralRepo = referralRepo;
             _signInManager = signInManager;
             _userRepo = userRepo;
+            _context = context;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -374,7 +377,8 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private bool IsCustomerUsernameAvailable(string username)
         {
-            Customer existingCustomer = _obrnDbContext.Customers.FirstOrDefault(c => c.PkCustomerId == username);
+            obrnDbContext dbContext = new obrnDbContext();
+            Customer existingCustomer = dbContext.Customers.FirstOrDefault(c => c.PkCustomerId == username);
             return existingCustomer == null;
         }
 
@@ -397,7 +401,8 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             if (customer.FkReferralId != null)
             {
-                var referralType = await _referralRepo.GetReferralTypeById(customer.FkReferralId);
+                ReferralRepo referralRepo = new ReferralRepo(_context, _obrnDbContext);
+                var referralType = await referralRepo.GetReferralTypeById(customer.FkReferralId);
                 switch (referralType.ToString())
                 {
                     case "C":
@@ -416,14 +421,16 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private async Task<IActionResult> HandleCustomerReferralByCustomer(RegisterCustomerDTO customer, IdentityUser user)
         {
-            var referrerCustomerId = await _referralRepo.GetFkReferredCustomerId(customer.FkReferralId);
+            ReferralRepo referralRepo1 = new ReferralRepo(_context, _obrnDbContext);
+            var referrerCustomerId = await referralRepo1.GetFkReferredCustomerId(customer.FkReferralId);
             ReferralDTO referralDTO = new ReferralDTO
             {
                 FkReferrerCustomerId = referrerCustomerId.ToString(),
                 FkReferredCustomerId = customer.PkCustomerId,
             };
 
-            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+            ReferralRepo referralRepo2 = new ReferralRepo(_context, _obrnDbContext);
+            var referralResult = await referralRepo2.CreateReferralCodeForCustomer(referralDTO);
             if (referralResult is OkObjectResult referralOkResult)
             {
                 Console.WriteLine("Referral code created");
@@ -434,14 +441,17 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private async Task<IActionResult> HandleCustomerReferralByBusiness(RegisterCustomerDTO customer, IdentityUser user)
         {
-            var referrerBusinessId = await _referralRepo.GetFkReferredBusinessId(customer.FkReferralId);
+            ReferralRepo referralRepo1 = new ReferralRepo(_context, _obrnDbContext);
+
+            var referrerBusinessId = await referralRepo1.GetFkReferredBusinessId(customer.FkReferralId);
             ReferralDTO referralDTO = new ReferralDTO
             {
                 FkReferrerBusinessId = referrerBusinessId.ToString(),
                 FkReferredCustomerId = customer.PkCustomerId,
             };
 
-            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+            ReferralRepo referralRepo2 = new ReferralRepo(_context, _obrnDbContext);
+            var referralResult = await referralRepo2.CreateReferralCodeForCustomer(referralDTO);
             if (referralResult is OkObjectResult referralOkResult)
             {
                 Console.WriteLine("Referral code created");
@@ -452,12 +462,13 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private async Task<IActionResult> HandleDefaultCustomerReferral(RegisterCustomerDTO customer)
         {
+            ReferralRepo referralRepo = new ReferralRepo(_context, _obrnDbContext);
             ReferralDTO referralDTO = new ReferralDTO
             {
                 FkReferredCustomerId = customer.PkCustomerId,
             };
 
-            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+            var referralResult = await referralRepo.CreateReferralCodeForCustomer(referralDTO);
             if (referralResult is OkObjectResult referralOkResult)
             {
                 Console.WriteLine("Referral code created");
