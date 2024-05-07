@@ -40,7 +40,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     PkFeeId = fee.PkFeeId,
                     Amount = fee.Amount,
                     Description = fee.Description,
-                    Percentage = fee.Percentage,
+                    Percent = fee.Percent,
                     FeeType = fee.FeeType,
                     Frequency = fee.Frequency,
                 });
@@ -51,7 +51,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 isSuccess = false;
             }
 
-            return isSuccess;           
+            return isSuccess;
         }
 
         public bool Update(FeeAndCommission fee)
@@ -62,7 +62,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 editedFee.Amount = fee.Amount;
                 editedFee.Description = fee.Description;
                 editedFee.Frequency = fee.Frequency;
-                editedFee.Percentage = fee.Percentage;
+                editedFee.Percent = fee.Percent;
                 editedFee.FeeType = fee.FeeType;
 
                 try

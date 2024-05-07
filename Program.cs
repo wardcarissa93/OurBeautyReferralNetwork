@@ -121,27 +121,27 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowReactApp",
-//        builder =>
-//        {
-//            builder.WithOrigins("https://calm-hill-024d52d1e.5.azurestaticapps.net/")
-//                   .AllowAnyHeader()
-//                   .AllowAnyMethod();
-//        });
-//});
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         builder =>
         {
-            builder.WithOrigins("http://localhost:5173")
+            builder.WithOrigins("https://calm-hill-024d52d1e.5.azurestaticapps.net/")
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
 });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowReactApp",
+//        builder =>
+//        {
+//            builder.WithOrigins("http://localhost:5173")
+//                   .AllowAnyHeader()
+//                   .AllowAnyMethod();
+//        });
+//});
 
 // Set Stripe API Key
 StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
@@ -173,9 +173,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowReactApp"); 
+app.UseCors("AllowReactApp");
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
