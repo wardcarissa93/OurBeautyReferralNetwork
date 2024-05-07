@@ -26,8 +26,4 @@ public partial class Subscription
     public string? FkTransactionId { get; set; }
 
     public virtual Business FkBusiness { get; set; } = null!;
-
-    public virtual Transaction? FkTransaction { get; set; }
-
-    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }
