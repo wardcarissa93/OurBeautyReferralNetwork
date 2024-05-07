@@ -18,13 +18,15 @@ namespace OurBeautyReferralNetwork.Repositories
         private readonly ReferralRepo _referralRepo;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserRepo _userRepo;
+        private readonly ApplicationDbContext _context;
 
         public CustomerRepo(JWTUtilities jwtUtilities,
                             obrnDbContext obrnDbContext,
                             UserManager<IdentityUser> userManager,
                             ReferralRepo referralRepo,
                             SignInManager<IdentityUser> signInManager,
-                            UserRepo userRepo)
+                            UserRepo userRepo,
+                            ApplicationDbContext context)
         {
             _jwtUtilities = jwtUtilities;
             _obrnDbContext = obrnDbContext;
@@ -32,6 +34,7 @@ namespace OurBeautyReferralNetwork.Repositories
             _referralRepo = referralRepo;
             _signInManager = signInManager;
             _userRepo = userRepo;
+            _context = context;
         }
 
         public IEnumerable<Customer> GetAllCustomers()
@@ -54,7 +57,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new NotFoundObjectResult("Customer not found");
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return new BadRequestObjectResult($"Error getting customer: {ex.Message}");
             }
@@ -80,131 +83,14 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
-        //public async Task<IActionResult> AddCustomer(RegisterCustomerDTO customer)
-        //{
-        //    try
-        //    {
-        //        using (var dbContext = new obrnDbContext())
-        //        {
-        //            Customer existingCustomer = await dbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == customer.PkCustomerId);
-        //            if (existingCustomer != null)
-        //            {
-        //                return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
-        //            }
-
-        //            Customer newCustomer = new Customer
-        //            {
-        //                PkCustomerId = customer.PkCustomerId,
-        //                FirstName = customer.FirstName,
-        //                LastName = customer.LastName,
-        //                Phone = customer.Phone,
-        //                Birthdate = customer.Birthdate,
-        //                Email = customer.Email,
-        //                Vip = customer.Vip,
-        //                Confirm18 = customer.Confirm18
-        //            };
-
-        //            dbContext.Customers.Add(newCustomer);
-        //            await dbContext.SaveChangesAsync();
-        //            Console.WriteLine("New customer added");
-
-        //            var user = new IdentityUser
-        //            {
-        //                UserName = customer.PkCustomerId,
-        //                Email = customer.Email
-        //            };
-
-        //            var addUserResult = await _userManager.CreateAsync(user, customer.Password);
-
-        //            if (addUserResult.Succeeded)
-        //            {
-        //                Console.WriteLine("New user added");
-        //                var addUserRoleResult = await _userManager.AddToRoleAsync(user, "customer");
-
-        //                if (addUserRoleResult.Succeeded)
-        //                {
-        //                    Console.WriteLine("Customer role added to new user");
-        //                    var token = _jwtUtilities.GenerateJwtToken(customer.Email);
-
-        //                    if (customer.FkReferralId != null)
-        //                    {
-        //                        var referralType = await _referralRepo.GetReferralTypeById(customer.FkReferralId);
-        //                        if (referralType.ToString() == "C")
-        //                        {
-        //                            var referrerCustomerId = await _referralRepo.GetFkReferredCustomerId(customer.FkReferralId);
-        //                            ReferralDTO referralDTO = new ReferralDTO
-        //                            {
-        //                                FkReferrerCustomerId = referrerCustomerId.ToString(),
-        //                                FkReferredCustomerId = customer.PkCustomerId
-        //                            };
-
-        //                            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
-        //                            if (referralResult is OkObjectResult referralOkResult)
-        //                            {
-        //                                Console.WriteLine("Referral code created");
-        //                                await _signInManager.SignInAsync(user, isPersistent: false);
-        //                                Console.WriteLine("User logged in");
-        //                                return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
-        //                            }
-        //                            return referralResult;
-        //                        }
-        //                        else if (referralType.ToString() == "B")
-        //                        {
-        //                            var referrerBusinessId = await _referralRepo.GetFkReferredBusinessId(customer.FkReferralId);
-        //                            ReferralDTO referralDTO = new ReferralDTO
-        //                            {
-        //                                FkReferrerBusinessId = referrerBusinessId.ToString(),
-        //                                FkReferredCustomerId = customer.PkCustomerId,
-        //                            };
-
-        //                            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
-        //                            if (referralResult is OkObjectResult referralOkResult)
-        //                            {
-        //                                Console.WriteLine("Referral code created");
-        //                                await _signInManager.SignInAsync(user, isPersistent: false);
-        //                                Console.WriteLine("User logged in");
-        //                                return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
-        //                            }
-        //                            return referralResult;
-        //                        }
-        //                    } 
-        //                    else
-        //                    {
-        //                        ReferralDTO referralDTO = new ReferralDTO
-        //                        {
-        //                            FkReferredCustomerId = customer.PkCustomerId
-        //                        };
-        //                        var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
-        //                        if (referralResult is OkObjectResult referralOkResult)
-        //                        {
-        //                            Console.WriteLine("Referral code created");
-        //                            await _signInManager.SignInAsync(user, isPersistent: false);
-        //                            Console.WriteLine("User logged in");
-        //                            return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
-        //                        }
-        //                        return referralResult;
-        //                    }
-        //                }
-
-        //                return new BadRequestObjectResult(new { Errors = addUserRoleResult.Errors });
-        //            }
-
-        //            return new BadRequestObjectResult(new { Errors = addUserResult.Errors });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new BadRequestObjectResult($"Error adding customer: {ex.Message}");
-        //    }
-        //}
-
         public async Task<IActionResult> AddCustomer(RegisterCustomerDTO customer)
         {
             try
             {
                 using (var dbContext = new obrnDbContext())
                 {
-                    if (!IsCustomerUsernameAvailable(customer.PkCustomerId))
+                    var isCustomerUsernameAvailable = await IsCustomerUsernameAvailable(customer.PkCustomerId);
+                    if (!isCustomerUsernameAvailable)
                     {
                         return new BadRequestObjectResult("Username unavailable. Please enter a different username.");
                     }
@@ -216,14 +102,14 @@ namespace OurBeautyReferralNetwork.Repositories
 
                     var user = await _userRepo.AddNewUser(customer.PkCustomerId, customer.Email, customer.Password, "customer");
 
-                    var token = _jwtUtilities.GenerateJwtToken(customer.Email);
+                    var token = await _jwtUtilities.GenerateJwtToken(customer.Email);
 
-                     var referralResult = await HandleCustomerReferral(customer, user);
+                    var referralResult = await HandleCustomerReferral(customer, user);
                     if (referralResult is OkObjectResult referralOkResult)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         Console.WriteLine("User logged in");
-                        return new OkObjectResult(new { Message = "Customer added successfully" , Token = token, ReferralId = referralOkResult.Value });
+                        return new OkObjectResult(new { Message = "Customer added successfully", Token = token, ReferralId = referralOkResult.Value });
                     }
                     return referralResult;
                 }
@@ -340,6 +226,17 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new NotFoundObjectResult("User not found");
                 }
 
+                // Find and delete the customer's referral code
+                Referral referralCode = await _obrnDbContext.Referrals.FirstOrDefaultAsync(r => r.FkReferredCustomerId == customerId);
+                _obrnDbContext.Referrals.Remove(referralCode);
+
+                // Find and delete any referrals made by this customer
+                var referrals = _obrnDbContext.Referrals.Where(r => r.FkReferredCustomerId == customerId);
+                if (referrals.Any())
+                {
+                    _obrnDbContext.Referrals.RemoveRange(referrals);
+                }
+
                 // Delete the customer
                 _obrnDbContext.Customers.Remove(customer);
                 await _obrnDbContext.SaveChangesAsync();
@@ -352,7 +249,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     return new BadRequestObjectResult("Error deleting user");
                 }
 
-                return new OkObjectResult("Customer and associated user deleted successfully");
+                return new OkObjectResult("Customer and associated user and referrals deleted successfully");
             }
             catch (Exception ex)
             {
@@ -361,9 +258,10 @@ namespace OurBeautyReferralNetwork.Repositories
         }
 
 
-        private bool IsCustomerUsernameAvailable(string username)
+        private async Task<bool> IsCustomerUsernameAvailable(string username)
         {
-            Customer existingCustomer = _obrnDbContext.Customers.FirstOrDefault(c => c.PkCustomerId == username);
+            obrnDbContext dbContext = new obrnDbContext();
+            Customer existingCustomer = await dbContext.Customers.FirstOrDefaultAsync(c => c.PkCustomerId == username);
             return existingCustomer == null;
         }
 
@@ -386,7 +284,8 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             if (customer.FkReferralId != null)
             {
-                var referralType = await _referralRepo.GetReferralTypeById(customer.FkReferralId);
+                ReferralRepo referralRepo = new ReferralRepo(_context, _obrnDbContext);
+                var referralType = await referralRepo.GetReferralTypeById(customer.FkReferralId);
                 switch (referralType.ToString())
                 {
                     case "C":
@@ -405,14 +304,16 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private async Task<IActionResult> HandleCustomerReferralByCustomer(RegisterCustomerDTO customer, IdentityUser user)
         {
-            var referrerCustomerId = await _referralRepo.GetFkReferredCustomerId(customer.FkReferralId);
+            ReferralRepo referralRepo1 = new ReferralRepo(_context, _obrnDbContext);
+            var referrerCustomerId = await referralRepo1.GetFkReferredCustomerId(customer.FkReferralId);
             ReferralDTO referralDTO = new ReferralDTO
             {
                 FkReferrerCustomerId = referrerCustomerId.ToString(),
                 FkReferredCustomerId = customer.PkCustomerId,
             };
 
-            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+            ReferralRepo referralRepo2 = new ReferralRepo(_context, _obrnDbContext);
+            var referralResult = await referralRepo2.CreateReferralCodeForCustomer(referralDTO);
             if (referralResult is OkObjectResult referralOkResult)
             {
                 Console.WriteLine("Referral code created");
@@ -423,14 +324,17 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private async Task<IActionResult> HandleCustomerReferralByBusiness(RegisterCustomerDTO customer, IdentityUser user)
         {
-            var referrerBusinessId = await _referralRepo.GetFkReferredBusinessId(customer.FkReferralId);
+            ReferralRepo referralRepo1 = new ReferralRepo(_context, _obrnDbContext);
+
+            var referrerBusinessId = await referralRepo1.GetFkReferredBusinessId(customer.FkReferralId);
             ReferralDTO referralDTO = new ReferralDTO
             {
                 FkReferrerBusinessId = referrerBusinessId.ToString(),
                 FkReferredCustomerId = customer.PkCustomerId,
             };
 
-            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+            ReferralRepo referralRepo2 = new ReferralRepo(_context, _obrnDbContext);
+            var referralResult = await referralRepo2.CreateReferralCodeForCustomer(referralDTO);
             if (referralResult is OkObjectResult referralOkResult)
             {
                 Console.WriteLine("Referral code created");
@@ -441,12 +345,13 @@ namespace OurBeautyReferralNetwork.Repositories
 
         private async Task<IActionResult> HandleDefaultCustomerReferral(RegisterCustomerDTO customer)
         {
+            ReferralRepo referralRepo = new ReferralRepo(_context, _obrnDbContext);
             ReferralDTO referralDTO = new ReferralDTO
             {
                 FkReferredCustomerId = customer.PkCustomerId,
             };
 
-            var referralResult = await _referralRepo.CreateReferralCodeForCustomer(referralDTO);
+            var referralResult = await referralRepo.CreateReferralCodeForCustomer(referralDTO);
             if (referralResult is OkObjectResult referralOkResult)
             {
                 Console.WriteLine("Referral code created");

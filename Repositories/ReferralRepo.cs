@@ -52,7 +52,6 @@ namespace OurBeautyReferralNetwork.Repositories
                 var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralId);
                 if (referral != null)
                 {
-                    Console.WriteLine("*****REFERRAL TYPE: " + referral.ReferredType);
                     return referral.ReferredType;
                 }
                 else
@@ -63,6 +62,90 @@ namespace OurBeautyReferralNetwork.Repositories
             catch (Exception ex)
             {
                 throw new Exception($"Error getting referral type: {ex.Message}");
+            }
+        }
+
+        public async Task<string> GetCustomerReferralCode(string customerId)
+        {
+            try
+            {
+                obrnDbContext newObrnDbContext = new obrnDbContext();
+                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.FkReferredCustomerId == customerId);
+                if (referral != null)
+                {
+                    return referral.PkReferralId;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Referral not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting referral code: {ex.Message}");
+            }
+        }
+
+        public async Task<string> GetBusinessReferralCode(string businessId)
+        {
+            try
+            {
+                obrnDbContext newObrnDbContext = new obrnDbContext();
+                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.FkReferredBusinessId == businessId);
+                if (referral != null)
+                {
+                    return referral.PkReferralId;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Referral not found");
+                }
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception($"Error getting referral code: {ex.Message}");
+            }
+        }
+
+        public async Task<string> GetFkReferredCustomerId(string referralId)
+        {
+            try
+            {
+                obrnDbContext newObrnDbContext = new obrnDbContext();
+                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralId);
+                if (referral != null)
+                {
+                    return referral.FkReferredCustomerId;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Referral not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting fkReferredCustomerId: {ex.Message}");
+            }
+        }
+
+        public async Task<string> GetFkReferredBusinessId(string referralId)
+        {
+            try
+            {
+                obrnDbContext newObrnDbContext = new obrnDbContext();
+                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralId);
+                if (referral != null)
+                {
+                    return referral.FkReferredBusinessId;
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Referral not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting fkReferredBusinessId: {ex.Message}");
             }
         }
 
@@ -171,49 +254,5 @@ namespace OurBeautyReferralNetwork.Repositories
         //        return new BadRequestObjectResult($"Error completing referral: {ex.Message}");
         //    }
         //}
-
-        public async Task<string> GetFkReferredCustomerId(string referralId)
-        {
-            try
-            {
-                obrnDbContext newObrnDbContext = new obrnDbContext();
-                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralId);
-                if (referral != null)
-                {
-                    Console.WriteLine("*****REFERRED BY CUSTOMER: " + referral.FkReferredCustomerId);
-                    return referral.FkReferredCustomerId;
-                }
-                else
-                {
-                    throw new KeyNotFoundException("Referral not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error getting fkReferredCustomerId: {ex.Message}");
-            }
-        }
-
-        public async Task<string> GetFkReferredBusinessId(string referralId)
-        {
-            try
-            {
-                obrnDbContext newObrnDbContext = new obrnDbContext();
-                var referral = await newObrnDbContext.Referrals.FirstOrDefaultAsync(r => r.PkReferralId == referralId);
-                if (referral != null)
-                {
-                    Console.WriteLine("*****REFERRED BY BUSINESS: " + referral.FkReferredBusinessId);
-                    return referral.FkReferredBusinessId;
-                }
-                else
-                {
-                    throw new KeyNotFoundException("Referral not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error getting fkReferredBusinessId: {ex.Message}");
-            }
-        }
     }
 }

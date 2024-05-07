@@ -50,7 +50,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 isSuccess = false;
             }
 
-            return isSuccess;           
+            return isSuccess;
         }
 
         public bool Update(FeeAndCommission fee)
