@@ -61,7 +61,7 @@ namespace OurBeautyReferralNetwork.Repositories
                     return "Fee does not exist";
                 }
 
-                if (_obrnContext.Discounts.Any(d => d.PkDiscountId == discountId))
+                if (_obrnContext.Services.Any(s => s.FkDiscountId == discountId))
                 {
                     return "this discount is currently in use";
                 }

@@ -68,21 +68,21 @@ namespace WebApiDemo.Controllers
 
 
 
-        [HttpPost]
-        [Route("CheckOut/success={session_id}")]
+        //[HttpPost]
+        //[Route("CheckOut/success={session_id}")]
 
-        public IActionResult CreateTransaction([FromRoute][Required] string session_id, decimal tax)
-        {
-            TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
-            Transaction createdTransaction = transactionRepo.CreateTransactionForBusiness(session_id, tax);
+        //public IActionResult CreateTransaction([FromRoute][Required] string session_id, decimal tax)
+        //{
+        //    TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
+        //    Transaction createdTransaction = transactionRepo.CreateTransactionForBusiness(session_id, tax);
 
-            if (createdTransaction != null)
-            {
-                return CreatedAtAction(nameof(TransactionGetAll), createdTransaction);
-            }
-            return BadRequest("Failed to create the transaction");
+        //    if (createdTransaction != null)
+        //    {
+        //        return CreatedAtAction(nameof(TransactionGetAll), createdTransaction);
+        //    }
+        //    return BadRequest("Failed to create the transaction");
 
-        }
+        //}
 
         [HttpPost("create-checkout-session-subscription")]
         public async Task<IActionResult> CreateCheckoutSessionSubscription()
