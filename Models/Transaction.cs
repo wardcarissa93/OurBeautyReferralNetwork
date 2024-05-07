@@ -5,7 +5,7 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Transaction
 {
-    public required string PkTransactionId { get; set; }
+    public string PkTransactionId { get; set; } = null!;
 
     public string? FkCustomerId { get; set; }
 
@@ -23,13 +23,7 @@ public partial class Transaction
 
     public string TransactionTitle { get; set; } = null!;
 
-    public int FkSubscriptionId { get; set; }
-
     public virtual Business? FkBusiness { get; set; }
 
     public virtual Customer? FkCustomer { get; set; }
-
-    public virtual Subscription FkSubscription { get; set; } = null!;
-
-    public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 }

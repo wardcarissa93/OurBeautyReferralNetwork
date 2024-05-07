@@ -397,7 +397,9 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.FkBusinessId)
                 .HasMaxLength(30)
                 .HasColumnName("fkBusinessID");
-            entity.Property(e => e.FkTransactionId).HasColumnName("fkTransactionID");
+            entity.Property(e => e.FkTransactionId)
+                .HasMaxLength(200)
+                .HasColumnName("fkTransactionID");
             entity.Property(e => e.Frequency)
                 .HasMaxLength(8)
                 .IsFixedLength();
@@ -408,10 +410,6 @@ public partial class obrnDbContext : DbContext
                 .HasForeignKey(d => d.FkBusinessId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Subscription_fkBusinessID_fkey");
-
-            entity.HasOne(d => d.FkTransaction).WithMany(p => p.Subscriptions)
-                .HasForeignKey(d => d.FkTransactionId)
-                .HasConstraintName("fk_transaction_id");
         });
 
         modelBuilder.Entity<Testimonial>(entity =>
@@ -439,7 +437,9 @@ public partial class obrnDbContext : DbContext
 
             entity.ToTable("Transaction");
 
-            entity.Property(e => e.PkTransactionId).HasColumnName("pkTransactionID");
+            entity.Property(e => e.PkTransactionId)
+                .HasMaxLength(200)
+                .HasColumnName("pkTransactionID");
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.FkBusinessId)
                 .HasMaxLength(30)
@@ -447,7 +447,6 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.FkCustomerId)
                 .HasMaxLength(20)
                 .HasColumnName("fkCustomerID");
-            entity.Property(e => e.FkSubscriptionId).HasColumnName("fkSubscriptionID");
             entity.Property(e => e.TransactionDate).HasColumnType("timestamp without time zone");
             entity.Property(e => e.TransactionTitle).HasMaxLength(255);
 
@@ -458,10 +457,6 @@ public partial class obrnDbContext : DbContext
             entity.HasOne(d => d.FkCustomer).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.FkCustomerId)
                 .HasConstraintName("Transaction_fkCustomerID_fkey");
-
-            entity.HasOne(d => d.FkSubscription).WithMany(p => p.Transactions)
-                .HasForeignKey(d => d.FkSubscriptionId)
-                .HasConstraintName("fk_subscription_id");
         });
 
         OnModelCreatingPartial(modelBuilder);
