@@ -1,9 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
+using OurBeautyReferralNetwork.Repositories;
 using Stripe;
 using Stripe.Checkout;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace WebApiDemo.Controllers
@@ -13,6 +19,8 @@ namespace WebApiDemo.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly obrnDbContext _obrnContext;
+        private readonly ApplicationDbContext _context;
 
         public PaymentController(IConfiguration configuration)
         {
@@ -25,6 +33,7 @@ namespace WebApiDemo.Controllers
             try
             {
                 StripeConfiguration.ApiKey = _configuration["StripeKey"] ?? throw new Exception("StripeKey not found in configuration");
+
 
 
                 var options = new SessionCreateOptions
@@ -40,7 +49,7 @@ namespace WebApiDemo.Controllers
                     },
                     Mode = "payment",
                     CustomerCreation = "always",
-                    SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
+                    SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/success={CHECKOUT_SESSION_ID}",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
                 };
 
@@ -49,12 +58,30 @@ namespace WebApiDemo.Controllers
 
                 // Redirect the customer to the Stripe-hosted checkout page
 
-                return Ok(new {url = session.Url});
+                return Ok(new {url = session.Url, sessionId = session.Id});
             }
             catch (Exception ex)
             {
                 return BadRequest(new { Error = ex.Message });
             }
+        }
+
+
+
+        [HttpPost]
+        [Route("CheckOut/success={session_id}")]
+
+        public IActionResult CreateTransaction([FromRoute][Required] string session_id, decimal tax)
+        {
+            TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
+            Transaction createdTransaction = transactionRepo.CreateTransactionForBusiness(session_id, tax);
+
+            if (createdTransaction != null)
+            {
+                return CreatedAtAction(nameof(TransactionGetAll), createdTransaction);
+            }
+            return BadRequest("Failed to create the transaction");
+
         }
 
         [HttpPost("create-checkout-session-subscription")]
@@ -114,6 +141,18 @@ namespace WebApiDemo.Controllers
         //        return BadRequest("Failed to cancel subscription");
         //    }
         //}
+        [HttpGet]
+        [Route("/transactions")]
+        //[ValidateModelState]
+        [SwaggerOperation("TransactionGetAll")]
+        public virtual IActionResult TransactionGetAll()
+        {
+            TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
+            var transactions = transactionRepo.GetAllTransactionsBase();
+            return Ok(transactions);
+        }
+
+
 
     }
 }

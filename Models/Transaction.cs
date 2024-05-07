@@ -5,7 +5,7 @@ namespace OurBeautyReferralNetwork.Models;
 
 public partial class Transaction
 {
-    public int PkTransactionId { get; set; }
+    public required string PkTransactionId { get; set; }
 
     public string? FkCustomerId { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Transaction
 
     public decimal TotalAmount { get; set; }
 
-    public DateOnly TransactionDate { get; set; }
+    public DateTime TransactionDate { get; set; }
 
     public string Description { get; set; } = null!;
 

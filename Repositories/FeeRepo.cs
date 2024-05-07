@@ -40,7 +40,6 @@ namespace OurBeautyReferralNetwork.Repositories
                     PkFeeId = fee.PkFeeId,
                     Amount = fee.Amount,
                     Description = fee.Description,
-                    Percentage = fee.Percentage,
                     FeeType = fee.FeeType,
                     Frequency = fee.Frequency,
                 });
@@ -62,7 +61,6 @@ namespace OurBeautyReferralNetwork.Repositories
                 editedFee.Amount = fee.Amount;
                 editedFee.Description = fee.Description;
                 editedFee.Frequency = fee.Frequency;
-                editedFee.Percentage = fee.Percentage;
                 editedFee.FeeType = fee.FeeType;
 
                 try

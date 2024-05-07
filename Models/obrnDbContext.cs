@@ -448,6 +448,7 @@ public partial class obrnDbContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("fkCustomerID");
             entity.Property(e => e.FkSubscriptionId).HasColumnName("fkSubscriptionID");
+            entity.Property(e => e.TransactionDate).HasColumnType("timestamp without time zone");
             entity.Property(e => e.TransactionTitle).HasMaxLength(255);
 
             entity.HasOne(d => d.FkBusiness).WithMany(p => p.Transactions)
