@@ -23,7 +23,7 @@ public partial class Subscription
 
     public bool IsActive { get; set; }
 
-    public int? FkTransactionId { get; set; }
+    public string? FkTransactionId { get; set; }
 
     public virtual Business FkBusiness { get; set; } = null!;
 
