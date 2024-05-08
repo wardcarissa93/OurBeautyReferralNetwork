@@ -36,7 +36,7 @@ namespace WebApiDemo.Controllers
 
 
         [HttpPost("create-checkout-session")]
-        public async Task<IActionResult> CreateCheckoutSession(string userId)
+        public async Task<IActionResult> CreateCheckoutSession(string userId, string itemId)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace WebApiDemo.Controllers
                     {
                         new SessionLineItemOptions
                         {
-                            Price = "price_1PDEdTEq0H2sm5gKFzTAU6L5", // Replace with your actual price ID or amount
+                            Price = itemId, // Replace with your actual price ID or amount
                             Quantity = 1,
                         },
                     },
@@ -67,7 +67,7 @@ namespace WebApiDemo.Controllers
 
                 // Redirect the customer to the Stripe-hosted checkout page
 
-                return Ok(new {url = session.Url, sessionId = session.Id});
+                return Ok(new { url = session.Url, sessionId = session.Id });
             }
             catch (Exception ex)
             {
@@ -176,6 +176,8 @@ namespace WebApiDemo.Controllers
                 return StatusCode(500); // Internal Server Error
             }
         }
+    }
+}
 
 
 //[HttpPost("cancel-subscription")]
