@@ -35,7 +35,8 @@ namespace WebApiDemo.Controllers
 
 
 
-        [HttpPost("create-checkout-session")]
+        [HttpPost("create-checkout-session/{userId}/{itemId}")]
+
         public async Task<IActionResult> CreateCheckoutSession(string userId, string itemId)
         {
             try
