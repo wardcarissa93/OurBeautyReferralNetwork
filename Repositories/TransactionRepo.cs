@@ -2,6 +2,8 @@
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
+using Stripe;
+using Stripe.BillingPortal;
 
 namespace OurBeautyReferralNetwork.Repositories
 {
@@ -21,32 +23,56 @@ namespace OurBeautyReferralNetwork.Repositories
             return _obrnContext.Transactions.ToList();
         }
 
-        //public Transaction CreateTransactionForBusiness(string session_id, decimal tax)
-        //{
-        //    var createdTransaction = new Transaction
-        //    {
-        //        PkTransactionId = session_id,
-        //        FkSubscriptionId = transaction.FkSubscriptionId,
-        //        FkBusinessId = transaction.FkBusinessId,
-        //        FkCustomerId = transaction.FkCustomerId,
-        //        BaseAmount = transaction.BaseAmount,
-        //        Tax = tax,
-        //        TotalAmount = transaction.TotalAmount,
-        //        TransactionDate = DateTime.UtcNow,
-        //        Description = transaction.Description,
-        //        TransactionTitle = transaction.TransactionTitle,
-        //    };
-        //    try
-        //    {
-        //        _obrnContext.Transactions.Add(createdTransaction);
-        //        _obrnContext.SaveChanges();
-        //        return createdTransaction;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.ToString());
-        //        return null;
-        //    }
-        //}
+        public Transaction CreateTransactionForBusiness(Charge charge, string userId)
+        {
+
+            var createdTransaction = new Transaction
+            {
+                PkTransactionId = charge.Id,
+                FkBusinessId = userId,
+                BaseAmount = charge.Amount,
+                TotalAmount = charge.AmountCaptured,
+                TransactionDate = DateTime.UtcNow,
+                Description = "VIP upgrade fee",
+                TransactionTitle ="VIP upgrade fee",
+            };
+            try
+            {
+                _obrnContext.Transactions.Add(createdTransaction);
+                _obrnContext.SaveChanges();
+                return createdTransaction;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+
+        public Transaction CreateTransactionForCustomer(Charge charge, string userId)
+        {
+
+            var createdTransaction = new Transaction
+            {
+                PkTransactionId = charge.Id,
+                FkCustomerId = userId,
+                BaseAmount = charge.Amount,
+                TotalAmount = charge.AmountCaptured,
+                TransactionDate = DateTime.UtcNow,
+                Description = "VIP upgrade fee",
+                TransactionTitle = "VIP upgrade fee",
+            };
+            try
+            {
+                _obrnContext.Transactions.Add(createdTransaction);
+                _obrnContext.SaveChanges();
+                return createdTransaction;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
     }
 }

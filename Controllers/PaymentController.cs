@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
@@ -21,14 +22,21 @@ namespace WebApiDemo.Controllers
         private readonly IConfiguration _configuration;
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
+        private readonly CustomerRepo _customerRepo;
+        private readonly BusinessRepo _businessRepo;
 
-        public PaymentController(IConfiguration configuration)
+        public PaymentController(IConfiguration configuration, CustomerRepo customerRepo, BusinessRepo businessRepo)
         {
             _configuration = configuration;
+            _customerRepo = customerRepo;
+            _businessRepo = businessRepo;
+            _customerRepo = customerRepo;
         }
 
+
+
         [HttpPost("create-checkout-session")]
-        public async Task<IActionResult> CreateCheckoutSession()
+        public async Task<IActionResult> CreateCheckoutSession(string userId)
         {
             try
             {
@@ -49,6 +57,7 @@ namespace WebApiDemo.Controllers
                     },
                     Mode = "payment",
                     CustomerCreation = "always",
+                    ClientReferenceId = userId,
                     SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/success={CHECKOUT_SESSION_ID}",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
                 };
@@ -65,24 +74,6 @@ namespace WebApiDemo.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
-
-
-
-        //[HttpPost]
-        //[Route("CheckOut/success={session_id}")]
-
-        //public IActionResult CreateTransaction([FromRoute][Required] string session_id, decimal tax)
-        //{
-        //    TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
-        //    Transaction createdTransaction = transactionRepo.CreateTransactionForBusiness(session_id, tax);
-
-        //    if (createdTransaction != null)
-        //    {
-        //        return CreatedAtAction(nameof(TransactionGetAll), createdTransaction);
-        //    }
-        //    return BadRequest("Failed to create the transaction");
-
-        //}
 
         [HttpPost("create-checkout-session-subscription")]
         public async Task<IActionResult> CreateCheckoutSessionSubscription()
@@ -120,39 +111,92 @@ namespace WebApiDemo.Controllers
             }
         }
 
-        //[HttpPost("cancel-subscription")]
-        //public async Task<IActionResult> CancelSubscription(string userId)
-        //{
-        //    // Retrieve session ID associated with the user (from your database)
-        //    var sessionId = GetSessionIdForUser(userId); // Example method to get sessionId
 
-        //    // Cancel the subscription session using the Stripe API
-        //    var service = new SessionService();
-        //    var canceledSession = await service.CancelAsync(sessionId);
-
-        //    // Handle cancellation result (e.g., update database status)
-        //    if (canceledSession.Status == "canceled")
-        //    {
-        //        // Update user's subscription status in your database
-        //        return Ok("Subscription canceled successfully");
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Failed to cancel subscription");
-        //    }
-        //}
-        [HttpGet]
-        [Route("/transactions")]
-        //[ValidateModelState]
-        [SwaggerOperation("TransactionGetAll")]
-        public virtual IActionResult TransactionGetAll()
+        public async Task<IActionResult> WebhookHandler()
         {
-            TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
-            var transactions = transactionRepo.GetAllTransactionsBase();
-            return Ok(transactions);
+            var webhookSecret = _configuration["Webhook:Secret"];
+
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            try
+            {
+                Event? stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], webhookSecret);
+
+                var session = stripeEvent.Data.Object as Session;
+
+                var userId = session.ClientReferenceId;
+
+                var customer = await _customerRepo.GetCustomerById(userId);
+                var business = await _businessRepo.GetBusinessById(userId);
+
+                if (stripeEvent.Type == Events.ChargeSucceeded)
+                {
+                    Charge? charge = stripeEvent.Data.Object as Charge;
+                    if (charge != null)
+                    {
+                        TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
+                        try
+                        {
+                            if (customer != null)
+                            {
+                                Transaction transaction = transactionRepo.CreateTransactionForCustomer(charge, userId);
+                                // Log successful transaction for customer
+                                Console.WriteLine($"Successful charge for customer {userId}: {charge.Amount}");
+                            }
+                            else if (business != null)
+                            {
+                                Transaction transaction = transactionRepo.CreateTransactionForBusiness(charge, userId);
+                                // Log successful transaction for business
+                                Console.WriteLine($"Successful charge for business {userId}: {charge.Amount}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log transaction creation error
+                            Console.WriteLine($"Error creating transaction: {ex.Message}");
+                            return StatusCode(500); // Internal Server Error
+                        }
+                    }
+
+                    return Ok();
+                }
+                else
+                {
+                    Console.WriteLine("Unhandled event type: {0}", stripeEvent.Type);
+                    return Ok(); // or BadRequest() depending on your handling logic
+                }
+            }
+            catch (StripeException e)
+            {
+                Console.WriteLine("Stripe Error: {0}", e.Message);
+                return BadRequest(); // or StatusCode(500) if it's a critical error
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: {0}", ex.Message);
+                return StatusCode(500); // Internal Server Error
+            }
         }
 
 
+//[HttpPost("cancel-subscription")]
+//public async Task<IActionResult> CancelSubscription(string userId)
+//{
+//    // Retrieve session ID associated with the user (from your database)
+//    var sessionId = GetSessionIdForUser(userId); // Example method to get sessionId
 
-    }
-}
+//    // Cancel the subscription session using the Stripe API
+//    var service = new SessionService();
+//    var canceledSession = await service.CancelAsync(sessionId);
+
+//    // Handle cancellation result (e.g., update database status)
+//    if (canceledSession.Status == "canceled")
+//    {
+//        // Update user's subscription status in your database
+//        return Ok("Subscription canceled successfully");
+//    }
+//    else
+//    {
+//        return BadRequest("Failed to cancel subscription");
+//    }
+//}
+
