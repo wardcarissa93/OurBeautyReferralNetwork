@@ -58,7 +58,7 @@ namespace WebApiDemo.Controllers
                     Mode = "payment",
                     CustomerCreation = "always",
                     ClientReferenceId = userId,
-                    SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/success={CHECKOUT_SESSION_ID}",
+                    SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
                 };
 
