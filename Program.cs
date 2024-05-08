@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,13 +13,14 @@ using OurBeautyReferralNetwork.Repositories;
 using OurBeautyReferralNetwork.Utilities;
 using Stripe;
 using System;
+using System.Net;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
-
+var webhookSecret = builder.Configuration["WebhookEndpoint:Secret"];
 
 // Add services to the container.
 builder.Services.AddDbContext<obrnDbContext>(options =>
@@ -26,8 +28,6 @@ builder.Services.AddDbContext<obrnDbContext>(options =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
-
-Console.WriteLine($"Connection string: {connectionString}");
 
 builder.Services.AddScoped<CustomerRepo>();
 builder.Services.AddScoped<BusinessRepo>();
@@ -132,6 +132,9 @@ builder.Services.AddCors(options =>
         });
 });
 
+
+
+
 //builder.Services.AddCors(options =>
 //{
 //    options.AddPolicy("AllowReactApp",
@@ -146,20 +149,14 @@ builder.Services.AddCors(options =>
 // Set Stripe API Key
 StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
 
-//var options = new Stripe.Checkout.SessionCreateOptions
+//var options = new WebhookEndpointCreateOptions
 //{
-//    SuccessUrl = "https://example.com/success",
-//    LineItems = new List<Stripe.Checkout.SessionLineItemOptions>
-//    {
-//        new Stripe.Checkout.SessionLineItemOptions
-//        {
-//            Price = "price_1MotwRLkdIwHu7ixYcPLm5uZ",
-//            Quantity = 2,
-//        },
-//    },
-//    Mode = "payment",
+//    EnabledEvents = new List<string> { "checkout.session.completed"
+// },
+//    Url = "https://localhost:7110/api/Payment/webhook",
 //};
-//var service = new Stripe.Checkout.SessionService();
+
+//var service = new WebhookEndpointService();
 //service.Create(options);
 
 
