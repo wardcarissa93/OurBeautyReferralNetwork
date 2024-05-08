@@ -150,7 +150,7 @@ namespace OurBeautyReferralNetwork.Repositories
             }
             catch (Exception ex)
             {
-                return new BadRequestObjectResult($"Error editing customer: {ex.Message}");
+                return new BadRequestObjectResult($"Error editing business: {ex.Message}");
             }
         }
 
