@@ -112,6 +112,8 @@ namespace WebApiDemo.Controllers
         }
 
 
+        [HttpPost("webhook")]
+
         public async Task<IActionResult> WebhookHandler()
         {
             var webhookSecret = _configuration["Webhook:Secret"];
