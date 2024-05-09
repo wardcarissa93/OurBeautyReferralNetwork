@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace OurBeautyReferralNetwork.Repositories
 {
@@ -10,6 +11,7 @@ namespace OurBeautyReferralNetwork.Repositories
         {
             _userManager = userManager;
         }
+
 
         public async Task<IdentityUser> AddNewUser(string id, string email, string password, string role)
         {
