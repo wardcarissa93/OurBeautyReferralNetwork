@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
@@ -18,10 +19,10 @@ namespace OurBeautyReferralNetwork.Controllers
             _userRoleRepo = userRoleRepo;
         }
 
-        [HttpPost("add-user-role")]
-        public async Task<IActionResult> AddUserRole(string email, string roleName)
+        [HttpPost("add-user-role/{email}")]
+        public async Task<IActionResult> AddUserRole(string email, UserRoleDTO userRoleDTO)
         {
-            var result = await _userRoleRepo.AddUserRoleAsync(email, roleName);
+            var result = await _userRoleRepo.AddUserRoleAsync(email, userRoleDTO);
             return result;
         }
 

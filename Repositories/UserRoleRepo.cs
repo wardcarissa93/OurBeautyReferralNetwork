@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OurBeautyReferralNetwork.Data;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 
 namespace OurBeautyReferralNetwork.Repositories
@@ -18,18 +19,18 @@ namespace OurBeautyReferralNetwork.Repositories
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> AddUserRoleAsync(string email, string roleName)
+        public async Task<IActionResult> AddUserRoleAsync(string email, UserRoleDTO userRoleDTO)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user != null)
             {
-                var hasRole = await _userManager.IsInRoleAsync(user, roleName);
+                var hasRole = await _userManager.IsInRoleAsync(user, userRoleDTO.RoleName);
                 if (hasRole)
                 {
-                    return new BadRequestObjectResult($"User {email} already has the role {roleName}.");
+                    return new BadRequestObjectResult($"User {email} already has the role {userRoleDTO.RoleName}.");
                 }
 
-                var result = await _userManager.AddToRoleAsync(user, roleName);
+                var result = await _userManager.AddToRoleAsync(user, userRoleDTO.RoleName);
                 if (result.Succeeded)
                 {
                     return new OkObjectResult("Role assigned to user successfully.");
