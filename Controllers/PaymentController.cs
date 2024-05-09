@@ -67,8 +67,8 @@ namespace WebApiDemo.Controllers
                     Mode = "payment",
                     CustomerCreation = "always",
                     ClientReferenceId = userId,
-                    SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
-                    CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
+                    SuccessUrl = "https://localhost:5173/CheckOut/OrderConfirmation",
+                    CancelUrl = "https://localhost:5173/",
 
                 };
 
@@ -106,8 +106,8 @@ namespace WebApiDemo.Controllers
                     },
                     Mode = "subscription",
                     ClientReferenceId = userId,
-                    SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
-                    CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
+                    SuccessUrl = "https://localhost:5173/CheckOut/OrderConfirmation",
+                    CancelUrl = "https://localhost:5173/",
                     Metadata = new Dictionary<string, string> { { "subscription_stripe_id", itemId } },
                 };
                 var service = new SessionService();
