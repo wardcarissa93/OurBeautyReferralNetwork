@@ -42,7 +42,6 @@ namespace WebApiDemo.Controllers
 
 
         [HttpPost("create-checkout-session/{userId}/{itemId}")]
-
         public async Task<IActionResult> CreateCheckoutSession(string userId, string itemId)
         {
             try
@@ -52,35 +51,32 @@ namespace WebApiDemo.Controllers
                 {
                     throw new Exception("StripeKey not found in configuration");
                 }
-
                 var options = new SessionCreateOptions
                 {
                     PaymentMethodTypes = new List<string> { "card" },
                     LineItems = new List<SessionLineItemOptions>
-                    {
-                        new SessionLineItemOptions
-                        {
-                            Price = itemId, // Replace with your actual price ID or amount
-                            Quantity = 1,
-                        },
-                    },
+            {
+                new SessionLineItemOptions
+                {
+                    Price = itemId, // Replace with your actual price ID or amount
+                    Quantity = 1,
+                },
+            },
                     Mode = "payment",
                     CustomerCreation = "always",
                     ClientReferenceId = userId,
                     SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
-
                 };
-
                 var service = new SessionService();
                 var session = await service.CreateAsync(options);
-
                 // Redirect the customer to the Stripe-hosted checkout page
-
                 return Ok(new { url = session.Url, sessionId = session.Id });
             }
             catch (Exception ex)
             {
+                // Log the error for further debugging
+                Console.Error.WriteLine($"Error: {ex.Message}");
                 return BadRequest(new { Error = ex.Message });
             }
         }
