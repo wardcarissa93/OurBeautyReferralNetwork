@@ -20,7 +20,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
+Console.WriteLine("builder.Configuration[\"ConnectionStrings:DefaultConnection\"] = " + builder.Configuration["ConnectionStrings:DefaultConnection"]);
+
 StripeConfiguration.ApiKey = builder.Configuration["StripeKey"];
+Console.WriteLine("builder.Configuration[\"StripeKey\"] = " + builder.Configuration["StripeKey"]);
+
 
 
 // Add services to the container.
