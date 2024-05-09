@@ -19,15 +19,15 @@ namespace OurBeautyReferralNetwork.Repositories
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> AddUserRoleAsync(string email, UserRoleDTO userRoleDTO)
+        public async Task<IActionResult> AddUserRoleAsync(UserRoleDTO userRoleDTO)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(userRoleDTO.Email);
             if (user != null)
             {
                 var hasRole = await _userManager.IsInRoleAsync(user, userRoleDTO.RoleName);
                 if (hasRole)
                 {
-                    return new BadRequestObjectResult($"User {email} already has the role {userRoleDTO.RoleName}.");
+                    return new BadRequestObjectResult($"User {userRoleDTO.Email} already has the role {userRoleDTO.RoleName}.");
                 }
 
                 var result = await _userManager.AddToRoleAsync(user, userRoleDTO.RoleName);
