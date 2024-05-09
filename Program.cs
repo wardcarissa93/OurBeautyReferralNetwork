@@ -22,15 +22,8 @@ var connectionString = builder.Configuration["ConnectionStrings:DefaultConnectio
 
 var webhookSecret = builder.Configuration["WebhookEndpoint:Secret"];
 
-//StripeConfiguration.ApiKey = builder.Configuration[key: "StripeKey"];
+StripeConfiguration.ApiKey = builder.Configuration["StripeKey"];
 
-var stripeApiKey = builder.Configuration["Stripe:ApiKey"];
-// Set the Stripe API key
-if (string.IsNullOrEmpty(stripeApiKey))
-{
-    throw new Exception("Stripe API key is not configured. Please check your settings.");
-}
-StripeConfiguration.ApiKey = stripeApiKey;
 
 // Add services to the container.
 builder.Services.AddDbContext<obrnDbContext>(options =>
