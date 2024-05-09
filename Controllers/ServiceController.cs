@@ -91,7 +91,7 @@ namespace OurBeautyReferralNetwork.Controllers
         public virtual IActionResult GetServiceForBusiness(string businessId, int serviceId)
         {
             ServiceRepo serviceRepo = new ServiceRepo(_context, _obrnContext);
-            var services = serviceRepo.GetAllServicesOfBusiness(businessId);
+            var services = serviceRepo.GetServiceOfBusiness(businessId, serviceId);
             return Ok(services);
         }
 
