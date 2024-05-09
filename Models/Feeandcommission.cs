@@ -18,4 +18,6 @@ public partial class FeeAndCommission
     public string FeeType { get; set; } = null!;
 
     public string Frequency { get; set; } = null!;
+
+    public string? StripeId { get; set; }
 }

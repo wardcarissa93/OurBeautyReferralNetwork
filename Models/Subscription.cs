@@ -17,10 +17,6 @@ public partial class Subscription
 
     public string FeeType { get; set; } = null!;
 
-    public string Frequency { get; set; } = null!;
-
-    public DateOnly NextPaymentDay { get; set; }
-
     public bool IsActive { get; set; }
 
     public string? FkTransactionId { get; set; }

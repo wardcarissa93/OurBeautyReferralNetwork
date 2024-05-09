@@ -260,6 +260,7 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.Frequency)
                 .HasMaxLength(8)
                 .IsFixedLength();
+            entity.Property(e => e.StripeId).HasMaxLength(200);
             entity.Property(e => e.Title).HasMaxLength(100);
         });
 
@@ -400,9 +401,6 @@ public partial class obrnDbContext : DbContext
             entity.Property(e => e.FkTransactionId)
                 .HasMaxLength(200)
                 .HasColumnName("fkTransactionID");
-            entity.Property(e => e.Frequency)
-                .HasMaxLength(8)
-                .IsFixedLength();
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.SubscriptionTitle).HasMaxLength(255);
 
