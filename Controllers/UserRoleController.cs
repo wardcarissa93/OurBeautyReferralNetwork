@@ -19,7 +19,7 @@ namespace OurBeautyReferralNetwork.Controllers
             _userRoleRepo = userRoleRepo;
         }
 
-        [HttpPost("add-user-role/{email}")]
+        [HttpPost("add-user-role")]
         public async Task<IActionResult> AddUserRole(UserRoleDTO userRoleDTO)
         {
             var result = await _userRoleRepo.AddUserRoleAsync(userRoleDTO);
