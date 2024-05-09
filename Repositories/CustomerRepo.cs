@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NBitcoin.Protocol;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
@@ -236,6 +237,10 @@ namespace OurBeautyReferralNetwork.Repositories
                 {
                     _obrnDbContext.Referrals.RemoveRange(referrals);
                 }
+
+                // Find and delete transactions associated with customer
+                TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnDbContext);
+                var message = transactionRepo.DeleteTransactionsFromUser(customerId);
 
                 // Delete the customer
                 _obrnDbContext.Customers.Remove(customer);
