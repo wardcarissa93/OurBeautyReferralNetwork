@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using OurBeautyReferralNetwork.Repositories;
 
@@ -24,9 +25,9 @@ namespace OurBeautyReferralNetwork.Controllers
         }
 
         [HttpPost("add-role")]
-        public async Task<IActionResult> AddRole([FromBody] string roleName)
+        public async Task<IActionResult> AddRole(RoleDTO role)
         {
-            var result = await _roleRepo.AddRole(roleName);
+            var result = await _roleRepo.AddRole(role.RoleName);
             return result;
         }
     }
