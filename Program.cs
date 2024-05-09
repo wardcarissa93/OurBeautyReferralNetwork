@@ -131,7 +131,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         builder =>
         {
-            builder.WithOrigins("https://calm-hill-024d52d1e.5.azurestaticapps.net/")
+            builder.WithOrigins("https://localhost:5173/")
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
