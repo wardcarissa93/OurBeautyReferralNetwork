@@ -24,7 +24,6 @@ var webhookSecret = builder.Configuration["WebhookEndpoint:Secret"];
 
 StripeConfiguration.ApiKey = builder.Configuration["StripeKey"];
 
-
 // Add services to the container.
 builder.Services.AddDbContext<obrnDbContext>(options =>
     options.UseNpgsql(connectionString));
