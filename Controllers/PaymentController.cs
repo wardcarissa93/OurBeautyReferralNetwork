@@ -140,8 +140,8 @@ namespace WebApiDemo.Controllers
 
                     Console.WriteLine("Charge: ", session?.AmountTotal);
                     Console.WriteLine("User Id: ", session?.ClientReferenceId);
+
                     userId = session?.ClientReferenceId;
-                    String stripeId = session?.Metadata["subscription_stripe_id"];
                     TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
                     var customer = await _customerRepo.GetCustomerById(userId);
                     var business = await _businessRepo.GetBusinessById(userId);
@@ -158,6 +158,8 @@ namespace WebApiDemo.Controllers
                             Transaction transaction = transactionRepo.CreateTransactionForBusiness(session, userId);
                             if (session.Mode == "subscription")
                             {
+                                String stripeId = session?.Metadata["subscription_stripe_id"];
+
                                 var transactionId = transaction.PkTransactionId;
                                 FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
                                 
