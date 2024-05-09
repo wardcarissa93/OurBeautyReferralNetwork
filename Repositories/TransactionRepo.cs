@@ -23,6 +23,16 @@ namespace OurBeautyReferralNetwork.Repositories
             return _obrnContext.Transactions.ToList();
         }
 
+        public IEnumerable<Transaction> GetAllTransactionsFromUser(string userId) 
+        {
+            var allTransactions = GetAllTransactionsBase();
+
+            // Filter transactions by UserId
+            var transactionsFromUser = allTransactions.Where(t => t.FkCustomerId == userId);
+
+            return transactionsFromUser;
+        }
+
         public Transaction CreateTransactionForBusiness(Session session, string userId)
         {
 
@@ -72,6 +82,28 @@ namespace OurBeautyReferralNetwork.Repositories
             {
                 Console.WriteLine(ex.ToString());
                 return null;
+            }
+        }
+
+        public string DeleteTransactionsFromUser(string userId)
+        {
+            try
+            {
+                IEnumerable<Transaction> transactions = GetAllTransactionsFromUser(userId);
+                if (transactions == null)
+                {
+                    return "Transaction does not exist";
+                }
+                _obrnContext.Transactions.RemoveRange(transactions);
+                _obrnContext.SaveChanges();
+                return "Deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // You can also return a custom error message if needed
+                Console.WriteLine($"Error occurred during delete: {ex.Message}");
+                return "An error occurred during delete";
             }
         }
     }
