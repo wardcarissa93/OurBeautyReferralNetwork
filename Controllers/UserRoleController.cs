@@ -25,7 +25,7 @@ namespace OurBeautyReferralNetwork.Controllers
             return result;
         }
 
-        [HttpGet("get-user-roles")]
+        [HttpGet("get-user-roles/{email}")]
         public async Task<IList<string>> GetUserRoles(string email)
         {
             var roles = await _userRoleRepo.GetUserRolesAsync(email);
