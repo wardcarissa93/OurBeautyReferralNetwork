@@ -15,7 +15,7 @@ namespace OurBeautyReferralNetwork.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet]
+        [HttpGet("get-sas-token")]
         public IActionResult GetSasToken()
         {
             try
