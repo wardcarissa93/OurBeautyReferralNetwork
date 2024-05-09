@@ -22,6 +22,8 @@ var connectionString = builder.Configuration["ConnectionStrings:DefaultConnectio
 
 var webhookSecret = builder.Configuration["WebhookEndpoint:Secret"];
 
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
+
 // Add services to the container.
 builder.Services.AddDbContext<obrnDbContext>(options =>
     options.UseNpgsql(connectionString));
