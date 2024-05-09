@@ -16,15 +16,19 @@ using System.Threading.Tasks;
 
 namespace WebApiDemo.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class PaymentController : ControllerBase
     {
+
         private readonly IConfiguration _configuration;
         private readonly obrnDbContext _obrnContext;
         private readonly ApplicationDbContext _context;
         private readonly CustomerRepo _customerRepo;
         private readonly BusinessRepo _businessRepo;
+
 
         public PaymentController(IConfiguration configuration, CustomerRepo customerRepo, obrnDbContext obrnDbContext, BusinessRepo businessRepo)
         {
@@ -65,7 +69,6 @@ namespace WebApiDemo.Controllers
                     ClientReferenceId = userId,
                     SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
-                    Metadata = new Dictionary<string, string> { { "user_id", userId } },
 
                 };
 
@@ -82,16 +85,12 @@ namespace WebApiDemo.Controllers
             }
         }
 
-        [HttpPost("create-checkout-session-subscription")]
-        public async Task<IActionResult> CreateCheckoutSessionSubscription()
+        [HttpPost("create-checkout-session-subscription/{userId}/{itemId}")]
+        public async Task<IActionResult> CreateCheckoutSessionSubscription(string userId, string itemId)
         {
             try
             {
-                // Ensure Stripe API Key is set properly
-                if (string.IsNullOrEmpty(StripeConfiguration.ApiKey) || StripeConfiguration.ApiKey == "SKey not found")
-                {
-                    throw new Exception("StripeKey not found in configuration");
-                }
+                var webhookSecret = _configuration["Webhook:Secret"];
 
                 var options = new SessionCreateOptions
                 {
@@ -100,21 +99,21 @@ namespace WebApiDemo.Controllers
                     {
                         new SessionLineItemOptions
                         {
-                            Price = "price_1PDHjEEq0H2sm5gKUcXpb9fv",
+                            Price = itemId,
                             Quantity = 1,
                         },
 
                     },
                     Mode = "subscription",
+                    ClientReferenceId = userId,
                     SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
+                    Metadata = new Dictionary<string, string> { { "subscription_stripe_id", itemId } },
                 };
                 var service = new SessionService();
                 var session = await service.CreateAsync(options);
 
-                // Redirect the customer to the Stripe-hosted checkout page using the hosted checkout link
-                var hostedCheckoutLink = $"https://buy.stripe.com/test_7sIbJb1C9eMzh20eUU";
-                return Ok(hostedCheckoutLink);
+                return Ok(new { url = session.Url, sessionId = session.Id });
             }
             catch (Exception ex)
             {
@@ -142,6 +141,7 @@ namespace WebApiDemo.Controllers
                     Console.WriteLine("Charge: ", session?.AmountTotal);
                     Console.WriteLine("User Id: ", session?.ClientReferenceId);
                     userId = session?.ClientReferenceId;
+                    String stripeId = session?.Metadata["subscription_stripe_id"];
                     TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
                     var customer = await _customerRepo.GetCustomerById(userId);
                     var business = await _businessRepo.GetBusinessById(userId);
@@ -156,6 +156,14 @@ namespace WebApiDemo.Controllers
                         else if (business is OkObjectResult)
                         {
                             Transaction transaction = transactionRepo.CreateTransactionForBusiness(session, userId);
+                            if (session.Mode == "subscription")
+                            {
+                                var transactionId = transaction.PkTransactionId;
+                                FeeRepo feeRepo = new FeeRepo(_context, _obrnContext);
+                                
+                                SubscriptionRepo subscriptionRepo = new SubscriptionRepo(_context, _obrnContext, feeRepo);
+                                OurBeautyReferralNetwork.Models.Subscription subscription = subscriptionRepo.CreateSubscriptionForBusiness(session, userId, stripeId, transactionId);
+                            }
                             // Log successful transaction for business
                             Console.WriteLine($"Successful charge for business {userId}: {session.AmountTotal}");
                         }
@@ -182,29 +190,28 @@ namespace WebApiDemo.Controllers
             }
 
         }
+
+        //[HttpPost("cancel-subscription/{subscriptionId}")]
+        //public async Task<IActionResult> CancelSubscription(string subscriptionId)
+        //{
+        //    // Cancel the subscription session using the Stripe API
+        //    var service = new SubscriptionService();
+        //    var canceledSession = service.CancelAsync(subscriptionId);
+
+        //    // Handle cancellation result (e.g., update database status)
+        //    if (canceledSession.Status == "canceled")
+        //    {
+        //        // Update user's subscription status in your database
+        //        return Ok("Subscription canceled successfully");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Failed to cancel subscription");
+        //    }
+        //}
     }
 }
 
 
-//[HttpPost("cancel-subscription")]
-//public async Task<IActionResult> CancelSubscription(string userId)
-//{
-//    // Retrieve session ID associated with the user (from your database)
-//    var sessionId = GetSessionIdForUser(userId); // Example method to get sessionId
 
-//    // Cancel the subscription session using the Stripe API
-//    var service = new SessionService();
-//    var canceledSession = await service.CancelAsync(sessionId);
-
-//    // Handle cancellation result (e.g., update database status)
-//    if (canceledSession.Status == "canceled")
-//    {
-//        // Update user's subscription status in your database
-//        return Ok("Subscription canceled successfully");
-//    }
-//    else
-//    {
-//        return BadRequest("Failed to cancel subscription");
-//    }
-//}
 

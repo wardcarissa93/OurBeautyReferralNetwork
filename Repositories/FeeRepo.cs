@@ -30,6 +30,16 @@ namespace OurBeautyReferralNetwork.Repositories
             return fee;
         }
 
+        public FeeAndCommission GetFeeByStripeId(string stripeId)
+        {
+            var fee = _obrnContext.FeeAndCommissions.FirstOrDefault(f => f.StripeId == stripeId);
+            if (fee == null)
+            {
+                return null;
+            }
+            return fee;
+        }
+
         public bool CreateFee(FeeAndCommission fee)
         {
             bool isSuccess = true;
