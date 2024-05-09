@@ -3,7 +3,7 @@ using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
 using OurBeautyReferralNetwork.Models;
 using Stripe;
-using Stripe.BillingPortal;
+using Stripe.Checkout;
 
 namespace OurBeautyReferralNetwork.Repositories
 {
@@ -23,18 +23,18 @@ namespace OurBeautyReferralNetwork.Repositories
             return _obrnContext.Transactions.ToList();
         }
 
-        public Transaction CreateTransactionForBusiness(Charge charge, string userId)
+        public Transaction CreateTransactionForBusiness(Session session, string userId)
         {
 
             var createdTransaction = new Transaction
             {
-                PkTransactionId = charge.Id,
+                PkTransactionId = session.Id,
                 FkBusinessId = userId,
-                BaseAmount = charge.Amount,
-                TotalAmount = charge.AmountCaptured,
-                TransactionDate = DateTime.UtcNow,
-                Description = "VIP upgrade fee",
-                TransactionTitle ="VIP upgrade fee",
+                BaseAmount = Convert.ToDecimal(session.AmountTotal),
+                TotalAmount = Convert.ToDecimal(session.AmountTotal),
+                TransactionDate = DateTime.Now,
+                Description = "Business VIP upgrade fee",
+                TransactionTitle ="Business VIP upgrade fee",
             };
             try
             {
@@ -49,18 +49,18 @@ namespace OurBeautyReferralNetwork.Repositories
             }
         }
 
-        public Transaction CreateTransactionForCustomer(Charge charge, string userId)
+        public Transaction CreateTransactionForCustomer(Session session, string userId)
         {
 
             var createdTransaction = new Transaction
             {
-                PkTransactionId = charge.Id,
+                PkTransactionId = session.Id,
                 FkCustomerId = userId,
-                BaseAmount = charge.Amount,
-                TotalAmount = charge.AmountCaptured,
-                TransactionDate = DateTime.UtcNow,
-                Description = "VIP upgrade fee",
-                TransactionTitle = "VIP upgrade fee",
+                BaseAmount = Convert.ToDecimal(session.AmountTotal),
+                TotalAmount = Convert.ToDecimal(session.AmountTotal),
+                TransactionDate = DateTime.Now,
+                Description = "Customer VIP upgrade fee",
+                TransactionTitle = "Customer VIP upgrade fee",
             };
             try
             {

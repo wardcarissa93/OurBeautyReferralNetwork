@@ -22,6 +22,8 @@ var connectionString = builder.Configuration["ConnectionStrings:DefaultConnectio
 
 var webhookSecret = builder.Configuration["WebhookEndpoint:Secret"];
 
+StripeConfiguration.ApiKey = builder.Configuration["StripeKey"];
+
 // Add services to the container.
 builder.Services.AddDbContext<obrnDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -145,19 +147,6 @@ builder.Services.AddCors(options =>
 //                   .AllowAnyMethod();
 //        });
 //});
-
-// Set Stripe API Key
-StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
-
-//var options = new WebhookEndpointCreateOptions
-//{
-//    EnabledEvents = new List<string> { "checkout.session.completed"
-// },
-//    Url = "https://localhost:7110/api/Payment/webhook",
-//};
-
-//var service = new WebhookEndpointService();
-//service.Create(options);
 
 
 var app = builder.Build();

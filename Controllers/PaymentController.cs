@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace WebApiDemo.Controllers
@@ -25,12 +26,13 @@ namespace WebApiDemo.Controllers
         private readonly CustomerRepo _customerRepo;
         private readonly BusinessRepo _businessRepo;
 
-        public PaymentController(IConfiguration configuration, CustomerRepo customerRepo, BusinessRepo businessRepo)
+        public PaymentController(IConfiguration configuration, CustomerRepo customerRepo, obrnDbContext obrnDbContext, BusinessRepo businessRepo)
         {
             _configuration = configuration;
             _customerRepo = customerRepo;
             _businessRepo = businessRepo;
             _customerRepo = customerRepo;
+            _obrnContext = obrnDbContext;
         }
 
 
@@ -41,9 +43,11 @@ namespace WebApiDemo.Controllers
         {
             try
             {
-                StripeConfiguration.ApiKey = _configuration["StripeKey"] ?? throw new Exception("StripeKey not found in configuration");
-
-
+                // Ensure Stripe API Key is set properly
+                if (string.IsNullOrEmpty(StripeConfiguration.ApiKey) || StripeConfiguration.ApiKey == "SKey not found")
+                {
+                    throw new Exception("StripeKey not found in configuration");
+                }
 
                 var options = new SessionCreateOptions
                 {
@@ -61,6 +65,8 @@ namespace WebApiDemo.Controllers
                     ClientReferenceId = userId,
                     SuccessUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/CheckOut/OrderConfirmation",
                     CancelUrl = "https://calm-hill-024d52d1e.5.azurestaticapps.net/",
+                    Metadata = new Dictionary<string, string> { { "user_id", userId } },
+
                 };
 
                 var service = new SessionService();
@@ -81,7 +87,11 @@ namespace WebApiDemo.Controllers
         {
             try
             {
-                StripeConfiguration.ApiKey = _configuration["StripeKey"] ?? throw new Exception("StripeKey not found in configuration");
+                // Ensure Stripe API Key is set properly
+                if (string.IsNullOrEmpty(StripeConfiguration.ApiKey) || StripeConfiguration.ApiKey == "SKey not found")
+                {
+                    throw new Exception("StripeKey not found in configuration");
+                }
 
                 var options = new SessionCreateOptions
                 {
@@ -118,55 +128,47 @@ namespace WebApiDemo.Controllers
         public async Task<IActionResult> WebhookHandler()
         {
             var webhookSecret = _configuration["Webhook:Secret"];
+            var userId = "";
 
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             try
             {
                 Event? stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], webhookSecret);
 
-                var session = stripeEvent.Data.Object as Session;
-
-                var userId = session.ClientReferenceId;
-
-                var customer = await _customerRepo.GetCustomerById(userId);
-                var business = await _businessRepo.GetBusinessById(userId);
-
-                if (stripeEvent.Type == Events.ChargeSucceeded)
+                if (stripeEvent.Type == Events.CheckoutSessionCompleted)
                 {
-                    Charge? charge = stripeEvent.Data.Object as Charge;
-                    if (charge != null)
+                    Session? session = stripeEvent.Data.Object as Session;
+
+                    Console.WriteLine("Charge: ", session?.AmountTotal);
+                    Console.WriteLine("User Id: ", session?.ClientReferenceId);
+                    userId = session?.ClientReferenceId;
+                    TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
+                    var customer = await _customerRepo.GetCustomerById(userId);
+                    var business = await _businessRepo.GetBusinessById(userId);
+                    try
                     {
-                        TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnContext);
-                        try
+                        if (customer is OkObjectResult)
                         {
-                            if (customer != null)
-                            {
-                                Transaction transaction = transactionRepo.CreateTransactionForCustomer(charge, userId);
-                                // Log successful transaction for customer
-                                Console.WriteLine($"Successful charge for customer {userId}: {charge.Amount}");
-                            }
-                            else if (business != null)
-                            {
-                                Transaction transaction = transactionRepo.CreateTransactionForBusiness(charge, userId);
-                                // Log successful transaction for business
-                                Console.WriteLine($"Successful charge for business {userId}: {charge.Amount}");
-                            }
+                            Transaction transaction = transactionRepo.CreateTransactionForCustomer(session, userId);
+                            // Log successful transaction for customer
+                            Console.WriteLine($"Successful charge for customer {userId}: {session.AmountTotal}");
                         }
-                        catch (Exception ex)
+                        else if (business is OkObjectResult)
                         {
-                            // Log transaction creation error
-                            Console.WriteLine($"Error creating transaction: {ex.Message}");
-                            return StatusCode(500); // Internal Server Error
+                            Transaction transaction = transactionRepo.CreateTransactionForBusiness(session, userId);
+                            // Log successful transaction for business
+                            Console.WriteLine($"Successful charge for business {userId}: {session.AmountTotal}");
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        // Log transaction creation error
+                        Console.WriteLine($"Error creating transaction: {ex.Message}");
+                        return StatusCode(500); // Internal Server Error
+                    }
+                }
 
-                    return Ok();
-                }
-                else
-                {
-                    Console.WriteLine("Unhandled event type: {0}", stripeEvent.Type);
-                    return Ok(); // or BadRequest() depending on your handling logic
-                }
+                return Ok();
             }
             catch (StripeException e)
             {
@@ -178,6 +180,7 @@ namespace WebApiDemo.Controllers
                 Console.WriteLine("Error: {0}", ex.Message);
                 return StatusCode(500); // Internal Server Error
             }
+
         }
     }
 }
