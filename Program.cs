@@ -20,7 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"];
 
-var webhookSecret = builder.Configuration["WebhookEndpoint:Secret"];
+StripeConfiguration.ApiKey = builder.Configuration["StripeKey"];
+
 
 // Add services to the container.
 builder.Services.AddDbContext<obrnDbContext>(options =>
@@ -147,7 +148,6 @@ builder.Services.AddCors(options =>
 //});
 
 // Set Stripe API Key
-StripeConfiguration.ApiKey = builder.Configuration["StripeKey"] ?? "SKey not found";
 
 //var options = new WebhookEndpointCreateOptions
 //{
