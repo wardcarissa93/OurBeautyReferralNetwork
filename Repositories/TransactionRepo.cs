@@ -33,6 +33,16 @@ namespace OurBeautyReferralNetwork.Repositories
             return transactionsFromUser;
         }
 
+        public IEnumerable<Transaction> GetAllTransactionsFromBusiness(string businessId)
+        {
+            var allTransactions = GetAllTransactionsBase();
+
+            // Filter transactions by UserId
+            var transactionsFromBusiness = allTransactions.Where(t => t.FkBusinessId == businessId);
+
+            return transactionsFromBusiness;
+        }
+
         public Transaction CreateTransactionForBusiness(Session session, string userId)
         {
 
@@ -90,6 +100,28 @@ namespace OurBeautyReferralNetwork.Repositories
             try
             {
                 IEnumerable<Transaction> transactions = GetAllTransactionsFromUser(userId);
+                if (transactions == null)
+                {
+                    return "Transaction does not exist";
+                }
+                _obrnContext.Transactions.RemoveRange(transactions);
+                _obrnContext.SaveChanges();
+                return "Deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // You can also return a custom error message if needed
+                Console.WriteLine($"Error occurred during delete: {ex.Message}");
+                return "An error occurred during delete";
+            }
+        }
+
+        public string DeleteTransactionsFromBusiness(string businessId)
+        {
+            try
+            {
+                IEnumerable<Transaction> transactions = GetAllTransactionsFromBusiness(businessId);
                 if (transactions == null)
                 {
                     return "Transaction does not exist";

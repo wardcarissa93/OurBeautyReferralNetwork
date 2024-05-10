@@ -31,6 +31,16 @@ namespace OurBeautyReferralNetwork.Repositories
             return testimonial;
         }
 
+        public Testimonial GetTestimonialOfBusiness(string businessId)
+        {
+            var testimonial = _obrnContext.Testimonials.FirstOrDefault(t => t.FkBusinessId == businessId);
+            if (testimonial == null)
+            {
+                return null; // Return a 404 Not Found response if feeId does not exist
+            }
+            return testimonial;
+        }
+
         public Testimonial CreateTestimonial(TestimonialDTO testimonialDTO)
         {
             var testimonial = new Testimonial
@@ -60,6 +70,29 @@ namespace OurBeautyReferralNetwork.Repositories
             try
             {
                 var testimonial = GetTestimonialById(TestimonialId);
+                if (testimonial == null)
+                {
+                    return "Testimonial does not exist";
+                }
+
+                _obrnContext.Testimonials.Remove(testimonial);
+                _obrnContext.SaveChanges();
+                return "Deleted successfully";
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                // You can also return a custom error message if needed
+                Console.WriteLine($"Error occurred during delete: {ex.Message}");
+                return "An error occurred during delete";
+            }
+        }
+
+        public string DeleteTestimonialOfBusiness(string businessId)
+        {
+            try
+            {
+                var testimonial = GetTestimonialOfBusiness(businessId);
                 if (testimonial == null)
                 {
                     return "Testimonial does not exist";
