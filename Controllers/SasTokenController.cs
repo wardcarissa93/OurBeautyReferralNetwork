@@ -37,7 +37,7 @@ namespace OurBeautyReferralNetwork.Controllers
                 // Set permissions and expiration for the SAS token
                 SharedAccessBlobPolicy sasPolicy = new SharedAccessBlobPolicy()
                 {
-                    Permissions = SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.List, // Adjust permissions as needed
+                    Permissions = SharedAccessBlobPermissions.Write | SharedAccessBlobPermissions.List | SharedAccessBlobPermissions.Read, // Adjust permissions as needed
                     SharedAccessExpiryTime = DateTime.UtcNow.AddHours(sasTokenExpirationHours) // Set expiration time based on configuration
                 };
 
