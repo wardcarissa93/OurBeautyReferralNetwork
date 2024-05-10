@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using OurBeautyReferralNetwork.Data;
 using OurBeautyReferralNetwork.DataTransferObjects;
@@ -182,6 +183,20 @@ namespace OurBeautyReferralNetwork.Repositories
                 {
                     _obrnDbContext.Referrals.RemoveRange(referrals);
                 }
+
+                //Find and delete any subscriptions of the business
+                FeeRepo feeRepo = new FeeRepo(_context, _obrnDbContext);
+                SubscriptionRepo subscriptionRepo = new SubscriptionRepo(_context, _obrnDbContext, feeRepo);
+                var deletedSubscription = subscriptionRepo.DeleteSubscriptionsFromBusiness(businessId);
+
+                //Find and delete all transactions of business
+                TransactionRepo transactionRepo = new TransactionRepo(_context, _obrnDbContext);
+                var deletedTransactions = transactionRepo.DeleteTransactionsFromBusiness(businessId);
+
+                //Find and delete all testimonials from business
+                TestimonialRepo testimonialRepo = new TestimonialRepo(_context, _obrnDbContext);
+                var deletedTestimonial = testimonialRepo.DeleteTestimonialOfBusiness(businessId);
+
 
                 // Delete the business
                 _obrnDbContext.Businesses.Remove(business);
