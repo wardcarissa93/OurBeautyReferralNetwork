@@ -12,5 +12,6 @@
         public string? City { get; set; }
         public string? Province { get; set; }
         public string? PostalCode { get; set; }
+        public string? Photo { get; set; }
     }
 }
