@@ -157,6 +157,7 @@ namespace OurBeautyReferralNetwork.Repositories
                 existingCustomer.Birthdate = customer.Birthdate;
                 //existingCustomer.Email = customer.Email;
                 existingCustomer.Vip = customer.Vip;
+                existingCustomer.Photo = customer.Photo;
 
                 // Save changes to the database
                 await _obrnDbContext.SaveChangesAsync();
